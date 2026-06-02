@@ -109,3 +109,10 @@ local.properties
 .env
 .env.*
 !.env.example
+
+
+# Eclipse IDE
+.metadata/
+.classpath
+.project
+.settings/
