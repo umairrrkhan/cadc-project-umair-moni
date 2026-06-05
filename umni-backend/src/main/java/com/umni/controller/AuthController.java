@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.umni.dto.SignupRequest;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,9 +29,9 @@ public class AuthController {
     private BCryptPasswordEncoder encoder;
 	
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody Map<String , String> body){
-		String email = body.get("email");
-		String password = body.get("password");
+	public ResponseEntity<?> signup(@RequestBody SignupRequest request){
+		String email = request.getEmail();
+		String password = request.getPassword();
 		
 		if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "email and password are required"));
