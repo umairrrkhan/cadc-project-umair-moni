@@ -1,6 +1,8 @@
 package com.umni.controller;
 
 import com.umni.model.User;
+
+import java.util.Optional;
 import com.umni.repository.UserRepository;
 import com.umni.service.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
+import jakarta.validation.Valid;
 
 import com.umni.dto.SignupRequest;
+
+import com.umni.dto.LoginRequest;
 
 
 @RestController
@@ -59,5 +64,30 @@ public class AuthController {
 				"role",user.getRole()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request){
+		String email = request.getEmail();
+		String password = request.getPassword();
+		
+		Optional<User> userOpt = userRepository.findByEmail(email);
+		
+		if(userOpt.isEmpty() || !encoder.matches(password , userOpt.get().getPassword())){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("error","invalid email or password"));
+		}
+		
+		User user = userOpt.get();
+		String token  = jwtUtil.generateToken(email);
+		Map<String , Object> response = new HashMap<>();
+		response.put("token" , token);
+		response.put("USER", Map.of("email",user.getEmail(),
+				"role",user.getRole()));
+		
+		return ResponseEntity.ok(response);
+	
+		
+	}
+	
 
 }

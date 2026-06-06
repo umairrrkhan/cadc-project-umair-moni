@@ -1,8 +1,15 @@
 package com.umni.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class LoginRequest {
 	
+	@NotBlank(message = "email is required")
+	@Email(message = "pls enter a valid email")
 	private String email ;
+	
+	@NotBlank (message = "password is required")
 	private String password;
 	
 	public LoginRequest() {}
