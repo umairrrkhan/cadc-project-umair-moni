@@ -1,13 +1,27 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+import api from '../service/api';
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!email.includes('@')) {
+      setError('Enter a valid email address');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     try {
       const res = await axios.post('http://localhost:8080/api/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);

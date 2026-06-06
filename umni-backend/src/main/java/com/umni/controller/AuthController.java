@@ -46,8 +46,8 @@ public class AuthController {
                     .body(Map.of("error", "email already exists"));
         }
         
-        if(password.length()<9) {
-        	return ResponseEntity.badRequest().body(Map.of("error","password must be at least 8 charachter"));
+        if(password.length()<5) {
+        	return ResponseEntity.badRequest().body(Map.of("error","password must be at least 6 charachter"));
         }
         
 		User user = new User();
@@ -62,7 +62,7 @@ public class AuthController {
 		response.put("token", token);
 		response.put("user", Map.of("email",user.getEmail(),
 				"role",user.getRole()));
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.ok(Map.of("token", token, "user", Map.of("email", request.getEmail())));
 	}
 	
 	@PostMapping("/login")
@@ -84,7 +84,7 @@ public class AuthController {
 		response.put("USER", Map.of("email",user.getEmail(),
 				"role",user.getRole()));
 		
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(Map.of("token", token, "user", Map.of("email", request.getEmail())));
 	
 		
 	}

@@ -27,11 +27,6 @@ public class User {
 	 public Date getCreatedAt() {return createdAt;}
 	 public void setCreatedAt(Date createdAt) {this.createdAt = createdAt;}
 	 public String getRole() {return role;}
-	 public void setRole(String Role) {this.role  = role;}
+	 public void setRole(String role) {this.role = role;}
 	 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

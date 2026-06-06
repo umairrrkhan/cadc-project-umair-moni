@@ -1,19 +1,37 @@
 import { useState } from "react";
 import axios from "axios";
 
+import api from '../service/api';
+
 const CreateAccountPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    if (!email.includes('@')) {
+      setError('Enter a valid email address');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/signup", { email, password });
+      const response = await axios.post("http://localhost:8080/api/auth/signup", { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
       localStorage.setItem("token", response.data.token);
       setMessage("Account created successfully!");
       setTimeout(()=> window.location.href = "/home", 2000);
     } catch (error) {
+      console.error("Full error:", error.response);
       setMessage("Error creating account. Please try again.");
     }
   };
