@@ -9,8 +9,10 @@ const CreateAccountPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/create-account", { email, password });
-      setMessage(response.data.message);
+      const response = await axios.post("http://localhost:8080/api/auth/signup", { email, password });
+      localStorage.setItem("token", response.data.token);
+      setMessage("Account created successfully!");
+      setTimeout(()=> window.location.href = "/home", 2000);
     } catch (error) {
       setMessage("Error creating account. Please try again.");
     }
@@ -25,19 +27,21 @@ const CreateAccountPage = () => {
             <label className="block text-gray-700">Email</label>
             <input
               type="email"
+              placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)} required 
               className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            /><br />
           </div>
           <div>
             <label className="block text-gray-700">Password</label>
             <input
               type="password"
+              placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)} required  
               className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            /><br />
           </div>
           <button
             type="submit"
@@ -47,6 +51,7 @@ const CreateAccountPage = () => {
           </button>
         </form>
         {message && <p className="text-green-500 mt-4">{message}</p>}
+        <a href="/login" className="text-blue-500 mt-4 block text-center">Already have an account? Log in</a>
       </div>
     </div>
   );
