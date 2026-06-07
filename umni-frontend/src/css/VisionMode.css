@@ -1,0 +1,55 @@
+.vision-wrapper{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+}
+
+.vision-panels{
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.panel{
+    width: 300px;
+    height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.panel:hover {
+    border-color: #007bff;
+}
+
+.panel img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.analyse-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.analyse-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

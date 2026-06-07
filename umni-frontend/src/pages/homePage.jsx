@@ -2,7 +2,7 @@ import React from 'react';
 import Sidebar from '../components/Sidebar';
 import TextMode from '../components/TextMode';
 import VisionMode from '../components/VisionMode';
-import './HomePage.css';
+import '..css/homePage.css  ';
 
 const homepage = () => {
 
