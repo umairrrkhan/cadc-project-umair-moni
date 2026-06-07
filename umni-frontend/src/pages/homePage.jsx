@@ -2,9 +2,9 @@ import React from 'react';
 import Sidebar from '../components/Sidebar';
 import TextMode from '../components/TextMode';
 import VisionMode from '../components/VisionMode';
-import '..css/homePage.css  ';
+import '../css/HomePage.css';
 
-const homepage = () => {
+const Homepage = () => {
 
     const [mode , setMode] = React.useState('text');
     const[conversation , setConversation] = React.useState([
@@ -41,4 +41,4 @@ const homepage = () => {
     );
 };
 
-export default homepage;
+export default Homepage;

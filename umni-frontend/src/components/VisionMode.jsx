@@ -1,5 +1,5 @@
-import React , {useState} from 'react';
-import './VisionMode.css';
+import React , {useState , useRef} from 'react';
+import '../css/VisionMode.css';
 
 const VisionMode = () => {
     const [uploadedImage, setUploadedImage] = useState(null);

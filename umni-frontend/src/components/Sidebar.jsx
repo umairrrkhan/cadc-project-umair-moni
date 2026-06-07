@@ -1,8 +1,8 @@
 import React , {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import '../css/Sidebar.css  ';  
+import '../css/Sidebar.css';  
 
-const Sidebar = () => ({ conversation  = [] , onNewChat}) => {
+const Sidebar = ({ conversation = [], onNewChat }) => {
     const[collapsed , setCollapsed] = useState(false);
     const navigate = useNavigate(); 
 

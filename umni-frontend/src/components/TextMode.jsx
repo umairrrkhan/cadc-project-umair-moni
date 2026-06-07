@@ -1,5 +1,5 @@
 import React , {useState} from 'react';
-import '../css/TextMode.css  ';
+import '../css/TextMode.css';
 
 const TextMode = () => {
     const [input, setInput] = useState('');
