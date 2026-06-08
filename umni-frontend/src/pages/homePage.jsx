@@ -1,4 +1,5 @@
 import React from 'react';
+import {useNavigate} from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import TextMode from '../components/TextMode';
 import VisionMode from '../components/VisionMode';
@@ -17,6 +18,11 @@ const Homepage = () => {
         console.log('New Chat');
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+    };
+
     return (
         <div className='home-layout'>
             <Sidebar conversation={conversation} onNewChat={handleNewChat}/>
@@ -29,16 +35,6 @@ const Homepage = () => {
             </div>
         </div>
     )
-    const logout = () => {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-    };
-    return (
-        <div style={{padding:20}}>
-            <h2>Welcome to UmNi Home Page</h2>
-            <button onClick={logout}>Logout</button>
-        </div>
-    );
 };
 
 export default Homepage;
