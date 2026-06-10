@@ -1,12 +1,12 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import TextMode from '../components/TextMode';
 import VisionMode from '../components/VisionMode';
 import '../css/HomePage.css';
 
 const Homepage = () => {
-
+    const navigate = useNavigate();
     const [mode , setMode] = React.useState('text');
     const[conversation , setConversation] = React.useState([
         {id:1 , title:'Chat 1' , group:'yesterday'},
@@ -15,12 +15,7 @@ const Homepage = () => {
     ]);
 
     const handleNewChat = () => {
-        console.log('New Chat');
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
+        navigate('/home');
     };
 
     return (
@@ -28,13 +23,13 @@ const Homepage = () => {
             <Sidebar conversation={conversation} onNewChat={handleNewChat}/>
             <div className='main-content'>
                 <div className='mode-toggle'>
-                    <button onClick={() => setMode('text')} className={mode === 'text' ? 'active' : ''}>Text Mode</button>
-                    <button onClick={() => setMode('vision')} className={mode === 'vision' ? 'active' : ''}>Vision Mode</button>
+                    <button onClick={() => setMode('text')} className={`mode-btn ${mode === 'text' ? 'active' : ''}`}>Text Mode</button>
+                    <button onClick={() => setMode('vision')} className={`mode-btn ${mode === 'vision' ? 'active' : ''}`}>Vision Mode</button>
                 </div>
                 {mode === 'text' ? <TextMode /> : <VisionMode />}
             </div>
         </div>
-    )
+    );
 };
 
 export default Homepage;
