@@ -116,3 +116,7 @@ local.properties
 .classpath
 .project
 .settings/
+
+application-local.properties
+
+application-local.properties
