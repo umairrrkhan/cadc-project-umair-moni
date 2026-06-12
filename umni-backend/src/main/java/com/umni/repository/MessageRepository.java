@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
+import com.umni.model.ChatSession;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message , String> {
@@ -26,6 +26,7 @@ public interface MessageRepository extends MongoRepository<Message , String> {
 	
 	List<Message> findByChatIdAndDeletedFalseOrderByCreatedAtAsc(String chatId);
 	
+	List<ChatSession> findByUserIdOrderByUpdatedAtDesc(String userId);
 	
 	void deleteByChatId(String chatId);
 	
