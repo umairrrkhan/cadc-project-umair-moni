@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.time.Instant;
 
-public interface MessageRepository extends MongoRepository {
+public interface MessageRepository extends MongoRepository<Message , String> {
 	
 	interface MessagePreview{
 		String getId();
@@ -13,8 +13,8 @@ public interface MessageRepository extends MongoRepository {
 		Instant getCreatedAt(); 
 	}
 	
-	List<Message> findByChatIdOrderByCreatedAsc(String chatId);
+	List<MessagePreview> findByChatIdOrderByCreatedAtAsc(String chatId);
 	
-	void deletedByChatId(String chatId);
+	void deleteByChatId(String chatId);
 	
 }
