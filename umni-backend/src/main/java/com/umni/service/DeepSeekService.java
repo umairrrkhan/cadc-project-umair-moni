@@ -25,10 +25,10 @@ public class DeepSeekService {
     	this.webClient = webClientBuilder.baseUrl(apiUrl).build();
     }
     
-    public Mono<String> getChatCompletion(String userMessage){
+    public Mono<String> getChatCompletion(List<Map<String , String >> messages){
     	Map<String , Object> requestBody = new HashMap<>();
     	requestBody.put("model", model);
-    	requestBody.put("messages", List.of(Map.of("role", "user", "content", userMessage)));
+        requestBody.put("messages", messages);
     	requestBody.put("stream", false);
     	
     	return webClient.post()
