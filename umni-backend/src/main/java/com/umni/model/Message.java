@@ -3,25 +3,35 @@ package com.umni.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.Date;
+
+import java.time.Instant;
+
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @Document(collection = "messages")
+@CompoundIndex(name = "chat_created_idx", def = "{'chatId': 1, 'createdAt': 1}")
 
 public class Message {
 
 	@Id
 	private String id ;
+	
+	@Indexed
 	private String chatId;
+	
 	private String role;
 	private String content;
-	private Date createdAt;
+	private Instant createdAt;
+	private boolean deleted;
 	
 	public Message() {}
 	public Message (String chatId , String role , String content) {
 		this.chatId = chatId;
 		this.role = role;
 		this.content = content;
-		this.createdAt = new Date();
+		this.createdAt = Instant.now();
+		this.deleted = false;
 	}
 	public String getId() {
 		return id;
@@ -47,11 +57,17 @@ public class Message {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public Date getCreatedAt() {
+	public Instant getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(Instant createdAt) {
 		this.createdAt = createdAt;
+	}
+	public boolean isDeleted() {
+		return deleted;
+	}
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 	
 	
