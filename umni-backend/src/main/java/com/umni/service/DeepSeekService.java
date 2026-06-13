@@ -52,5 +52,28 @@ public class DeepSeekService {
     				return Mono.just("sorry , something went wrong ,pls try again latter");
     			});
     }
+    
+    public Mono<String> getChatCompletionWithHistory(List<Map<String, String>> conversationHistory) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", model);
+        requestBody.put("messages", conversationHistory);
+        requestBody.put("stream", false);
+
+        return webClient.post()
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(response -> {
+                    List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+                    if (choices != null && !choices.isEmpty()) {
+                        Map<String, String> message = (Map<String, String>) choices.get(0).get("message");
+                        return message.get("content");
+                    }
+                    return "Sorry, I couldn't generate a response.";
+                });
+    
+    }
 
 }
