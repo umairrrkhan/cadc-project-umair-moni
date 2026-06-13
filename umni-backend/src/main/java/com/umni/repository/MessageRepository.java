@@ -26,7 +26,6 @@ public interface MessageRepository extends MongoRepository<Message , String> {
 	
 	List<Message> findByChatIdAndDeletedFalseOrderByCreatedAtAsc(String chatId);
 	
-	List<ChatSession> findByUserIdOrderByUpdatedAtDesc(String userId);
 		
 	void deleteByChatId(String chatId);
 	
