@@ -53,7 +53,7 @@ public class ChatController {
 	
 	@GetMapping("/session/{chatId}/messages")
 	public List<Message> getSessionMessages(@PathVariable String chatId){
-		return messageRepository.findByChatIdOrderByTimestampAsc(chatId);
+		return messageRepository.findByChatIdAndDeletedFalseOrderByCreatedAtAsc(chatId);
 	}
 	
 	@PostMapping("/session/{chatId}/message")
@@ -73,7 +73,9 @@ public class ChatController {
 		 ChatSession session = chatSessionRepository.findById(chatId).orElseThrow();
 		 session.setUpdatedAt(now);
 		 
-		 List<Message> previousMessages = messageRepository.findByChatIdOrderByTimestampAsc(chatId);
+		 chatSessionRepository.save(session);
+		 
+		 List<Message> previousMessages = messageRepository.findByChatIdAndDeletedFalseOrderByCreatedAtAsc(chatId);
 		 List<Map<String, String>> conversationHistory = previousMessages.stream()
 	                .map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
 	                .toList();
@@ -85,7 +87,7 @@ public class ChatController {
 	                    aiMsg.setChatId(chatId);
 	                    aiMsg.setRole("assistant");
 	                    aiMsg.setContent(aiReply);
-	                    aiMsg.setCreatedAt(now);
+	                    aiMsg.setCreatedAt(Instant.now());
 	                    messageRepository.save(aiMsg);
 	                    return Map.of("reply", aiReply);
 	                });
