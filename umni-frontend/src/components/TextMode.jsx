@@ -4,7 +4,7 @@ import '../service/chatService';
 
 const TextMode = () => {
     const [input, setInput] = useState('');
-    const [message, setMessage] = useState([]);
+    const [messages, setMessage] = useState([]);
     const [isLoading , setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
 
@@ -28,7 +28,7 @@ const TextMode = () => {
         scrollToBottom();
     }, [message]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!input.trim() || !chatId) return;
         const userMessage = input;
