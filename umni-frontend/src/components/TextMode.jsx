@@ -1,8 +1,8 @@
-import React , {useState} from 'react';
+import React , {useState , useEffect , useRef} from 'react';
 import '../css/TextMode.css';
-import '../service/chatService';
+import {chatService} from '../service/chatService';
 
-const TextMode = () => {
+const TextMode = ({chatId , onSessionUpdate}) => {
     const [input, setInput] = useState('');
     const [messages, setMessage] = useState([]);
     const [isLoading , setIsLoading] = useState(false);
@@ -26,7 +26,7 @@ const TextMode = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [message]);
+    }, [messages]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,7 +35,7 @@ const TextMode = () => {
         setInput('');
         setIsLoading(true);
 
-        setMessages(prev => [...prev, {
+        setMessage(prev => [...prev, {
             role: 'user',
             content: userMessage,
             timestamp: new Date().toISOString()
@@ -43,7 +43,7 @@ const TextMode = () => {
 
         try{
             const response = await chatService.sendMessage(chatId, userMessage);
-            setMessages(prev => [...prev, {
+            setMessage(prev => [...prev, {
                 role: 'assistant',
                 content: response.content,
                 timestamp: new Date().toISOString()
@@ -52,7 +52,7 @@ const TextMode = () => {
         } catch (error) {
             console.error('Failed to send message:', error);
 
-            setMessages(prev => [...prev, {
+            setMessage(prev => [...prev, {
                 role: 'assistant',
                 content: 'Failed to send message. Please try again.',
                 timestamp: new Date().toISOString()
@@ -65,7 +65,7 @@ const TextMode = () => {
     return (
         <div className='text-mode'>
             <div className='chat-messages'>
-                    {message.map((msg, index) => (
+                    {messages.map((msg, index) => (
                         <div key={index} className={`message ${msg.role}`}>
                             <strong>{msg.role === 'user' ? 'You' : 'UmNi'}:</strong> 
                             <p>{msg.content}</p>
