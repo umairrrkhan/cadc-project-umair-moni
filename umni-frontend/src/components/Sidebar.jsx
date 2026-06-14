@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Sidebar.css';
+import {chatService } from '../service/chatService';
 
-const Sidebar = ({ conversation = [], onNewChat }) => {
+const Sidebar = ({ onNewChat }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const navigate = useNavigate();
+    const [sessions, setSessions] = useState([]);
+
+    const loadSessions = async () => {
+        try {
+            const data = await chatService.getSesions();
+            setSessions(data);
+        } catch (error) {
+            console.error('Failed to load sessions:', error);
+        }
+    };
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -17,21 +28,31 @@ const Sidebar = ({ conversation = [], onNewChat }) => {
     lastMonth.setDate(today.getDate() - 30);
 
     const grouped = {
-        'Today': conversation.filter(c => new Date(c.createdAt) >= today),
-        'Yesterday': conversation.filter(c => new Date(c.createdAt) >= yesterday && new Date(c.createdAt) < today),
-        'Last7Days': conversation.filter(c => new Date(c.createdAt) >= lastWeek && new Date(c.createdAt) < yesterday),
-        'older': conversation.filter(c => new Date(c.createdAt) >= lastMonth && new Date(c.createdAt) < lastWeek),
+        'Today': sessions.filter(c => new Date(c.createdAt) >= today),
+        'Yesterday': sessions.filter(c => new Date(c.createdAt) >= yesterday && new Date(c.createdAt) < today),
+        'Last7Days': sessions.filter(c => new Date(c.createdAt) >= lastWeek && new Date(c.createdAt) < yesterday),
+        'older': sessions.filter(c => new Date(c.createdAt) >= lastMonth && new Date(c.createdAt) < lastWeek),
     };
 
     const handleNewChatClick = () => {
+        try{
+            const newSession = await chatService.createSession();
+            setSessions(prev => [newSession , ...prev]);
+            navigate('/chat/${newSession.id}');
         if (onNewChat) onNewChat();
-        navigate('/home');
+        }catch(error){
+            console.error("failed to create new chat:" , error);
+        }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         navigate('/login');
     };
+
+    useEffect(() => {
+        loadSessions();
+    }, []);
 
     return (
         <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
