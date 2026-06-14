@@ -11,7 +11,7 @@ const Sidebar = ({ onNewChat }) => {
 
     const loadSessions = async () => {
         try {
-            const data = await chatService.getSesions();
+            const data = await chatService.getSessions();
             setSessions(data);
         } catch (error) {
             console.error('Failed to load sessions:', error);
@@ -34,11 +34,11 @@ const Sidebar = ({ onNewChat }) => {
         'older': sessions.filter(c => new Date(c.createdAt) >= lastMonth && new Date(c.createdAt) < lastWeek),
     };
 
-    const handleNewChatClick = () => {
+    const handleNewChatClick = async () => {
         try{
             const newSession = await chatService.createSession();
             setSessions(prev => [newSession , ...prev]);
-            navigate('/chat/${newSession.id}');
+            navigate(`/chat/${newSession.id}`);
         if (onNewChat) onNewChat();
         }catch(error){
             console.error("failed to create new chat:" , error);
