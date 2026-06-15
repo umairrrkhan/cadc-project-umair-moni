@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 
-@Document(collection = "chat_session")
+@Document(collection = "chat_sessions")
 public class ChatSession {
 	
 	@Id
