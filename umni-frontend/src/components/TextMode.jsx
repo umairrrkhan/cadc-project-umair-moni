@@ -58,7 +58,7 @@ const TextMode = ({chatId , onSessionUpdate}) => {
             const response = await chatService.sendMessage(currentChatId, userMessage);
             setMessage(prev => [...prev, {
                 role: 'assistant',
-                content: response.content,
+                content: response.reply,
                 timestamp: new Date().toISOString()
             }]);
             onSessionUpdate(currentChatId, response);

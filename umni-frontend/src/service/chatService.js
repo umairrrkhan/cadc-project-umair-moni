@@ -19,12 +19,12 @@ export const chatService = {
     },
 
     getMessages: async (chatId) => {
-        const response = await axios.get(`${API_BASE_URL}/session/${chatId}/message`, { headers: getAuthHeaders() });
+        const response = await axios.get(`${API_BASE_URL}/session/${chatId}/messages`, { headers: getAuthHeaders() });
         return response.data;
     },
 
     sendMessage: async (chatId, content) => {
-        const response = await axios.post(`${API_BASE_URL}/sessions/${chatId}/message`, { content }, { headers: getAuthHeaders() });
+        const response = await axios.post(`${API_BASE_URL}/session/${chatId}/message`, { content }, { headers: getAuthHeaders() });
         return response.data;
     }
 }
