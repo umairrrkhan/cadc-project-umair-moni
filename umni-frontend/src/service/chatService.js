@@ -24,7 +24,7 @@ export const chatService = {
     },
 
     sendMessage: async (chatId, content) => {
-        const response = await axios.post(`${API_BASE_URL}/session/${chatId}/message`, { content }, { headers: getAuthHeaders() });
+        const response = await axios.post(`${API_BASE_URL}/session/${chatId}/message`, { message: content }, { headers: getAuthHeaders() });
         return response.data;
     }
 }
