@@ -9,22 +9,22 @@ const getAuthHeaders = () => {
 
 export const chatService = {
     createSession: async (title = 'New Chat') => {
-        const response = await axios.post(`${API_BASE_URL}/sessions/new`, { title }, { headers: getAuthHeaders() });
+        const response = await axios.post(`${API_BASE_URL}/session/new`, { title }, { headers: getAuthHeaders() });
         return response.data;
     },
 
     getSession : async () => {
-        const response = await axios.get(`${API_BASE_URL}/sessions`, { headers: getAuthHeaders() });
+        const response = await axios.get(`${API_BASE_URL}/session`, { headers: getAuthHeaders() });
         return response.data;
     },
 
     getMessages: async (chatId) => {
-        const response = await axios.get(`${API_BASE_URL}/sessions/${chatId}/messages`, { headers: getAuthHeaders() });
+        const response = await axios.get(`${API_BASE_URL}/session/${chatId}/message`, { headers: getAuthHeaders() });
         return response.data;
     },
 
     sendMessage: async (chatId, content) => {
-        const response = await axios.post(`${API_BASE_URL}/sessions/${chatId}/messages`, { content }, { headers: getAuthHeaders() });
+        const response = await axios.post(`${API_BASE_URL}/sessions/${chatId}/message`, { content }, { headers: getAuthHeaders() });
         return response.data;
     }
 }

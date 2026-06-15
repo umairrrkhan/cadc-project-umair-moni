@@ -15,8 +15,10 @@ function App() {
             <Routes>
                 <Route path="/" element={<LandingPage/>} />
                 <Route path="/create-account" element={<CreateAccountPage/>} />
+                <Route path="/home/:chatId" element={token ? <HomePage/> : <Navigate to="/login" />} />
                 <Route path="/home" element={token ? <HomePage/> : <Navigate to="/login" />} />
                 <Route path="/profile" element={token ? <UserProfilePage/> : <Navigate to="/login" />} />
+                <Route path="/chat/:chatId" element={token ? <HomePage/> : <Navigate to="/login" />} />
                 <Route path="/login" element={<LoginPage/>} />
                 <Route path="*" element={<Navigate to="/login" />} />
             </Routes>

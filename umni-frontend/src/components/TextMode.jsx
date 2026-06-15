@@ -30,7 +30,20 @@ const TextMode = ({chatId , onSessionUpdate}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!input.trim() || !chatId) return;
+        if (!input.trim()) return;
+        
+        let currentChatId = chatId;
+        if (!currentChatId) {
+            try {
+                const newChat = await chatService.createSession();
+                currentChatId = newChat.id;
+                window.history.replaceState(null, '', `/home/${currentChatId}`);
+                if (onSessionUpdate) onSessionUpdate(currentChatId, null);
+            } catch (err) {
+                console.error('Failed to create session:', err);
+                return;
+            }
+        }
         const userMessage = input;
         setInput('');
         setIsLoading(true);
@@ -42,13 +55,13 @@ const TextMode = ({chatId , onSessionUpdate}) => {
         }]);
 
         try{
-            const response = await chatService.sendMessage(chatId, userMessage);
+            const response = await chatService.sendMessage(currentChatId, userMessage);
             setMessage(prev => [...prev, {
                 role: 'assistant',
                 content: response.content,
                 timestamp: new Date().toISOString()
             }]);
-            onSessionUpdate(chatId, response);
+            onSessionUpdate(currentChatId, response);
         } catch (error) {
             console.error('Failed to send message:', error);
 
@@ -82,9 +95,9 @@ const TextMode = ({chatId , onSessionUpdate}) => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder='Type your message...'
-                    disabled={!chatId || isLoading}
+                    disabled={isLoading}
                 />
-                <button type='submit' disabled={!chatId || isLoading}>Send</button>
+                <button type='submit' disabled={isLoading}>Send</button>
                 </form>
             </div>
     );
