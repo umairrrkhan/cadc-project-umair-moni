@@ -2,6 +2,9 @@ package com.umni.controller;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import reactor.core.publisher.Mono;
 
 
@@ -33,7 +36,8 @@ public class ChatController {
 	}
 	
 	private String getCurrentUserId() {
-		return "test-user-id";
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return (String) auth.getDetails();
 	}
 	
 	@PostMapping("/session/new")
