@@ -13,6 +13,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
+
+import io.jsonwebtoken.Claims;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,9 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             if (jwtUtil.validateToken(token)) {
-                String email = jwtUtil.extractEmail(token);
+            	
+            	Claims claims = jwtUtil.extractAllClaims(token);
+                String email = claims.getSubject();
+                String userId = claims.get("userId", String.class);
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                        new UsernamePasswordAuthenticationToken(email,
+                        		null, 
+                        		Collections.emptyList());
+                
+                authentication.setDetails(Map.of("userId", userId));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
