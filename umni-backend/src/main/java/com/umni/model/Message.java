@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 
 @Document(collection = "messages")
 @CompoundIndex(name = "chat_created_idx", def = "{'chatId': 1, 'createdAt': 1}")
+@CompoundIndex(name = "user_created_idx", def = "{'userId': 1, 'createdAt': -1}")
 
 public class Message {
 
@@ -24,6 +25,8 @@ public class Message {
 	private String content;
 	private Instant createdAt;
 	private boolean deleted;
+	
+	@Indexed
 	private String userId;
 	public Message() {}
 	public Message (String chatId , String role , String content) {

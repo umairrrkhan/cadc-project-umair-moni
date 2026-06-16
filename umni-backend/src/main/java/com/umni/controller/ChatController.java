@@ -66,11 +66,14 @@ public class ChatController {
 		String userMessage = payload.get("message");
 		Instant now =  Instant.now();
 		
+		String userId= getCurrentUserId();
+		
 		Message userMsg = new Message();
 		userMsg.setChatId(chatId);
 		userMsg.setRole("user");
 		userMsg.setContent(userMessage);
 		userMsg.setCreatedAt(now);
+		userMsg.setUserId(userId); 
 		messageRepository.save(userMsg);
 		
 		
@@ -92,6 +95,7 @@ public class ChatController {
 	                    aiMsg.setRole("assistant");
 	                    aiMsg.setContent(aiReply);
 	                    aiMsg.setCreatedAt(Instant.now());
+	                    aiMsg.setUserId(userId); 
 	                    messageRepository.save(aiMsg);
 	                    return Map.of("reply", aiReply);
 	                });
