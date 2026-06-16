@@ -57,7 +57,7 @@ public class AuthController {
 		user.setRole("USER");
 		userRepository.save(user);
 		
-		String token = jwtUtil.generateToken(email);
+		String token = jwtUtil.generateToken(email , user.getId());
 		Map<String , Object> response = new HashMap<>();
 		response.put("token", token);
 		response.put("user", Map.of("email",user.getEmail(),
@@ -78,7 +78,7 @@ public class AuthController {
 		}
 		
 		User user = userOpt.get();
-		String token  = jwtUtil.generateToken(email);
+		String token  = jwtUtil.generateToken(email , user.getId());
 		Map<String , Object> response = new HashMap<>();
 		response.put("token" , token);
 		response.put("USER", Map.of("email",user.getEmail(),
