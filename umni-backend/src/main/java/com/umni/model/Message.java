@@ -24,7 +24,7 @@ public class Message {
 	private String content;
 	private Instant createdAt;
 	private boolean deleted;
-	
+	private String userId;
 	public Message() {}
 	public Message (String chatId , String role , String content) {
 		this.chatId = chatId;
@@ -68,6 +68,12 @@ public class Message {
 	}
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
 	
