@@ -1,4 +1,4 @@
-package com.umni.config;
+package com.umni.common.security;
 
 import java.util.List;
 

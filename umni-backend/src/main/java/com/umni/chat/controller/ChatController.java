@@ -1,4 +1,4 @@
-package com.umni.controller;
+package com.umni.chat.controller;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import com.umni.service.DeepSeekService;
-import com.umni.model.ChatSession;
-import com.umni.model.Message;
-import com.umni.repository.ChatSessionRepository;
-import com.umni.repository.MessageRepository;
+import com.umni.common.client.DeepSeekService;
+import com.umni.chat.model.ChatSession;
+import com.umni.chat.model.Message;
+import com.umni.chat.repository.ChatSessionRepository;
+import com.umni.chat.repository.MessageRepository;
 
 
 @RestController

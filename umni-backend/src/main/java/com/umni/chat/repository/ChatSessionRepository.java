@@ -1,6 +1,6 @@
-package com.umni.repository;
+package com.umni.chat.repository;
 
-import com.umni.model.ChatSession;
+import com.umni.chat.model.ChatSession;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.*;
 import java.util.List;

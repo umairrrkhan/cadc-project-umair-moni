@@ -1,4 +1,4 @@
-package com.umni.model;
+package com.umni.chat.model;
 
 
 import org.springframework.data.annotation.Id;

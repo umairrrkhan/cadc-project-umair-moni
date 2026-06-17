@@ -1,4 +1,4 @@
-package com.umni.service;
+package com.umni.common.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

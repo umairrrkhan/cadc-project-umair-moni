@@ -1,6 +1,6 @@
-package com.umni.repository;
+package com.umni.auth.repository;
 
-import com.umni.model.User;
+import com.umni.auth.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

@@ -1,10 +1,10 @@
-package com.umni.controller;
+package com.umni.auth.controller;
 
-import com.umni.model.User;
+import com.umni.auth.model.User;
 
 import java.util.Optional;
-import com.umni.repository.UserRepository;
-import com.umni.service.JwtUtil;
+import com.umni.auth.repository.UserRepository;
+import com.umni.common.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.HashMap;
 import jakarta.validation.Valid;
 
-import com.umni.dto.SignupRequest;
+import com.umni.auth.dto.SignupRequest;
 
-import com.umni.dto.LoginRequest;
+import com.umni.auth.dto.LoginRequest;
 
 
 @RestController

@@ -1,6 +1,6 @@
-package com.umni.config;
+package com.umni.common.security;
 
-import com.umni.service.JwtUtil;
+import com.umni.common.security.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,6 +1,6 @@
-package com.umni.repository;
+package com.umni.chat.repository;
 
-import com.umni.model.Message;
+import com.umni.chat.model.Message;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.time.Instant;
@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import com.umni.model.ChatSession;
+import com.umni.chat.model.ChatSession;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message , String> {
