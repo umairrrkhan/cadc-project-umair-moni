@@ -22,7 +22,6 @@ import com.umni.chat.repository.MessageRepository;
 
 @RestController
 @RequestMapping("/api/chat")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ChatController {
 	
 	private final DeepSeekService deepSeekService;
