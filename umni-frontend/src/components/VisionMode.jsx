@@ -135,18 +135,9 @@ const VisionMode = () => {
                     )}
                 </div>
             </div>
-            <div className="answer-container">
-                <input
-                    type="text"
-                    className="answer-input"
-                    placeholder="answer"
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                />
-            </div>
 
         {/* analyze button */}
-        <button className="analyze-btn" onClick={() => setAnswer('This is a simulated answer based on the uploaded image.')}>Analyze Image</button>){'}'}
+        <button className="analyze-btn" onClick={() => setAnswer('This is a simulated answer based on the uploaded image.')}>Analyze Image</button>
         </div>
     );
 };
