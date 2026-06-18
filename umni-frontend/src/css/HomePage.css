@@ -1,0 +1,39 @@
+.home-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #fff;
+    color: #e0e0e0  ;
+    font-family: 'inter', sans-serif;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.mode-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;    
+}
+
+.mode-btn{
+    padding: 0.5rem 1rem;
+    border-radius: 990px;
+    border: 1px solid #ccc;
+    background : transparent;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.mode-btn.active {
+    background-color: #1e1e2e;
+    color: #fff;
+    border-color: #007bff;
+}
