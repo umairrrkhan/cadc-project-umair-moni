@@ -7,7 +7,10 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
-
+import java.time.Duration;
+import reactor.netty.http.client.HttpClient;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 
 @Service
 public class DeepSeekService {
@@ -22,7 +25,12 @@ public class DeepSeekService {
     @Value("${deepseek.model}") String model){
     	this.apiKey = apiKey;
     	this.model = model;
-    	this.webClient = webClientBuilder.baseUrl(apiUrl).build();
+    	HttpClient httpClient = HttpClient.create()
+    	        .responseTimeout(Duration.ofSeconds(120));
+    	this.webClient = webClientBuilder
+    	        .baseUrl(apiUrl)
+    	        .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(httpClient))
+    	        .build();
     }
     
     public Mono<String> getChatCompletion(List<Map<String , String >> messages){
@@ -72,6 +80,10 @@ public class DeepSeekService {
                         return message.get("content");
                     }
                     return "Sorry, I couldn't generate a response.";
+                })
+                .onErrorResume(e -> {
+                    System.out.println("DeepSeek API error (withHistory): " + e.getMessage());
+                    return Mono.just("Sorry, something went wrong. Please try again later.");
                 });
     
     }

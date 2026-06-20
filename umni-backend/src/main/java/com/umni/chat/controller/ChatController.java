@@ -59,13 +59,13 @@ public class ChatController {
 	}
 	
 	@PostMapping("/session/new")
-	public Mono<ChatSession> newSession(@RequestBody Map<String , String > payload){
+	public ChatSession newSession(@RequestBody Map<String , String > payload){
 		ChatSession session = new ChatSession();
 		session.setUserId(getCurrentUserId());
 		session.setTitle(payload.getOrDefault("title", "New chat"));
 		session.setCreatedAt(Instant.now());
 		session.setUpdatedAt(Instant.now());
-		return Mono.just(chatSessionRepository.save(session));
+		return chatSessionRepository.save(session);
 	}
 	
 	@GetMapping("/session")
@@ -97,6 +97,12 @@ public class ChatController {
 		
 		 ChatSession session = chatSessionRepository.findById(chatId).orElseThrow();
 		 session.setUpdatedAt(now);
+		 
+		 // Set title from first user message
+		 if (session.getTitle() == null || session.getTitle().equals("New chat") || session.getTitle().equals("New Chat")) {
+		     String title = userMessage.length() > 50 ? userMessage.substring(0, 50) + "..." : userMessage;
+		     session.setTitle(title);
+		 }
 		 
 		 chatSessionRepository.save(session);
 		 
