@@ -47,7 +47,6 @@ public class SecurityConfig {
 		.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/auth/**").permitAll()
-				.requestMatchers("/api/chat/**").permitAll()
 				.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 				.anyRequest().authenticated()
 				)
