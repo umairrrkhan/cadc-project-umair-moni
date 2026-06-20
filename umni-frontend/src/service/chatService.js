@@ -38,5 +38,12 @@ export const chatService = {
     sendMessage: async (chatId, content) => {
         const response = await axios.post(`${API_BASE_URL}/session/${chatId}/message`, { message: content }, { headers: getAuthHeaders() });
         return response.data;
+    },
+
+    deleteSession: async (chatId) => {
+    await axios.delete(`${API_BASE_URL}/session/${chatId}`, {
+        headers: getAuthHeaders()
+    });
+    
     }
 }

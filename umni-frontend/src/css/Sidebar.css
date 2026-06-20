@@ -74,7 +74,6 @@
 
 .new-chat-btn:hover { background: #f5f5f5; border-color: #d1d5db; }
 
-/* ── CONVERSATION LIST ── */
 .conversation-list {
   flex: 1;
   overflow-y: auto;
@@ -97,6 +96,8 @@
 }
 
 .conv-item {
+  display: flex;
+  justify-content: space-between;
   padding: 8px 10px;
   border-radius: 7px;
   cursor: pointer;
@@ -115,9 +116,15 @@
   border-radius: 8px;
 }
 
+.conv-title{
+  flex:1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
 .conv-item:hover { background: #efefef; color: #111; }
 
-/* ── FOOTER ── */
 .sidebar-footer {
   border-top: 1px solid #e5e7eb;
   padding: 8px;

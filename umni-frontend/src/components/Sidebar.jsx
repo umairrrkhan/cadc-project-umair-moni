@@ -1,5 +1,5 @@
 import React, { useState , useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation , useNavigate } from 'react-router-dom';
 import '../css/Sidebar.css';
 import {chatService } from '../service/chatService';
 
@@ -8,6 +8,8 @@ const Sidebar = ({ onNewChat }) => {
     const [showProfile, setShowProfile] = useState(false);
     const [sessions, setSessions] = useState([]);
     const location = useLocation();
+    const [dropdownOpen , setDropdownOpen] = useState(null);
+    const navigate = useNavigate();
 
     const loadSessions = async () => {
         try {
@@ -35,12 +37,28 @@ const Sidebar = ({ onNewChat }) => {
     };
 
     const handleNewChatClick = () => {
-        window.location.href = '/home';
+        navigate('/home')
     };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        navigate('/login');
+    };
+
+    const handleDeleteChat = async (chatId) => {
+        if(!window.confirm('delete this conversation')) return ;
+        try{
+            await chatService.deleteSession(chatId);
+            setSessions(prev => prev.filter(s => s.id !== chatId));
+            setDropdownOpen(null);
+
+            if(location.pathname === `/home/${chatId}`){
+                navigate('/home');
+            }
+        } catch(err){
+            console.error("failed to delete chat: " ,err);
+            alert("count not delete the conversation.")
+        }
     };
 
     useEffect(() => {
@@ -65,19 +83,44 @@ const Sidebar = ({ onNewChat }) => {
                                 <div key={label} className="conv-group">
                                     <p className="conv-group-label">{label}</p>
                                     {items.map((conv, i) => {
-                                        const isActive = window.location.pathname === `/home/${conv.id}`;
+                                        const isActive = location.pathname === `/home/${conv.id}`;
                                         return (
                                         <div
-                                            key={i}
+                                            key={conv.id}
                                             className={`conv-item ${isActive ? 'active' : ''}`}
                                             onClick={() => {
                                                 if (!conv.id) return;
                                                 console.log('Clicked chat ID:', conv.id);
-                                                window.location.href = `/home/${conv.id}`;
+                                                navigate(`/home/${conv.id}`);
                                           }}
                                         >
-                                            {conv.title}
-                                        </div>
+                                            <span className="conv-title">{conv.title}</span>
+                                            <button
+                                            className="conv-menu-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDropdownOpen(
+                                                    dropdownOpen === conv.id ? null : conv.id 
+                                                );
+                                            }}
+                                            >
+                                                :
+                                            </button>
+
+                                            {dropdownOpen === conv.id && (
+                                                <div className = "conv-dropdown">
+                                                    <button
+                                                    className = "conv-dropdown-item delete"
+                                                    onClick={(e) =>{
+                                                        e.stopPropagation();
+                                                        handleDeleteChat(conv.id);
+                                                    }}
+                                                    >
+                                                        delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div> 
                                         );
                                     })}
                                 </div>
