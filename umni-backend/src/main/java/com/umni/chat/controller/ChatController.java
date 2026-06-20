@@ -40,11 +40,22 @@ public class ChatController {
 			throw new RuntimeException("User not authethicated");
 		}
 		
-		Map<String , Object> details = (Map<String , Object>)auth.getDetails();
-		if(details == null || !details.containsKey("userId")) {
-			throw new RuntimeException("user id not found in token");
-		}
-		return (String) details.get("userId");
+		Object details = auth.getDetails();
+		if (details instanceof Map) {
+	        Map<String, Object> map = (Map<String, Object>) details;
+	        String userId = (String) map.get("userId");
+	        if (userId != null) {
+	            System.out.println(" found userId from map : " + userId);
+	            return userId;
+	        }
+	    }
+		
+		Object principal = auth.getPrincipal();
+	    if (principal instanceof String && ((String) principal).contains("@")) {
+	        System.out.println("only email found in principal, but need userId");
+	    }
+
+	    throw new RuntimeException("user ID not found in authentication details");
 	}
 	
 	@PostMapping("/session/new")
