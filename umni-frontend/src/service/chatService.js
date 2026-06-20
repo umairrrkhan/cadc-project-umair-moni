@@ -13,7 +13,7 @@ export const chatService = {
         return response.data;
     },
 
-    getSession : async () => {
+    getSessions : async () => {
         const response = await axios.get(`${API_BASE_URL}/session`, { headers: getAuthHeaders() });
         return response.data;
     },

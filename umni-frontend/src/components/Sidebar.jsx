@@ -31,7 +31,7 @@ const Sidebar = ({ onNewChat }) => {
         'Today': sessions.filter(c => new Date(c.createdAt) >= today),
         'Yesterday': sessions.filter(c => new Date(c.createdAt) >= yesterday && new Date(c.createdAt) < today),
         'Last7Days': sessions.filter(c => new Date(c.createdAt) >= lastWeek && new Date(c.createdAt) < yesterday),
-        'older': sessions.filter(c => new Date(c.createdAt) >= lastMonth && new Date(c.createdAt) < lastWeek),
+        'older': sessions.filter(c => new Date(c.createdAt) < lastWeek)
     };
 
     const handleNewChatClick = async () => {
