@@ -125,6 +125,22 @@ public class ChatController {
 	                });
 	}
 	
+	@DeleteMapping("/session/{chatId}")
+	public ResponseEntity<Void> deleteSession(@PathVariable String chatId){
+		String userId = getCurrentUserId();
+		ChatSession session = chatSessionRepository.findById(chatId)
+				.orElseThrow(() -> new RuntimeException ("session not found"));
+		
+		if(!session.getUserId().equals(userId)) {
+			throw new RuntimeException("unauthorized");
+		}
+		
+		messageRepository.deleteByChatId(chatId);
+		
+		chatSessionRepository.deleteById(chatId);
+		
+		return ResponseEntity.noContent().build();
+	}
 	
 	
 	 
