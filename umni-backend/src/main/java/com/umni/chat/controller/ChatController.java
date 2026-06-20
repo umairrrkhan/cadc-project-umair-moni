@@ -36,7 +36,15 @@ public class ChatController {
 	
 	private String getCurrentUserId() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return (String) auth.getDetails();
+		if(auth == null) {
+			throw new RuntimeException("User not authethicated");
+		}
+		
+		Map<String , Object> details = (Map<String , Object>)auth.getDetails();
+		if(details == null || !details.containsKey("userId")) {
+			throw new RuntimeException("user id not found in token");
+		}
+		return (String) details.get("userId");
 	}
 	
 	@PostMapping("/session/new")
