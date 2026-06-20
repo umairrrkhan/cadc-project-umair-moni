@@ -7,10 +7,10 @@ const getAuthHeaders = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-const normalizeSession = (s) => ({
-    ...s,
-    id: s.id || s._id,
-});
+const normalizeSession = (s) => {
+    if (!s || typeof s !== 'object') return s;
+    return { ...s, id: s.id || s._id };
+};
 
 const normalizeMessages = (data) => {
     if (Array.isArray(data)) return data;

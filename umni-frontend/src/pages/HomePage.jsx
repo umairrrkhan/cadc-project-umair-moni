@@ -23,14 +23,6 @@ const Homepage = () => {
     setMode('text');
   }, [chatId]);
 
-  useEffect(() => {
-    if (mode === 'text' && !chatId) {
-      chatService.createSession?.()
-        .then(newChat => navigate(`/home/${newChat.id}`))
-        .catch(err => console.error('failed to create chat', err));
-    }
-  }, [mode, chatId, navigate]);
-
   return (
     <div className="home-root">
       <Sidebar onNewChat={handleNewChat} />

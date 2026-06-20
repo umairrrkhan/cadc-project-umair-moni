@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../css/TextMode.css';
 import { chatService } from '../service/chatService';
 
@@ -8,10 +9,38 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const pollRef = useRef(null);
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const startPolling = (sessionId) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    pollRef.current = setInterval(async () => {
+      try {
+        const data = await chatService.getMessages(sessionId);
+        const msgs = Array.isArray(data) ? data : [];
+        const last = msgs[msgs.length - 1];
+        if (last && last.role === 'assistant') {
+          setMessage(msgs);
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+          setIsLoading(false);
+          if (chatId !== sessionId) {
+            navigate(`/home/${sessionId}`, { replace: true });
+          }
+        }
+      } catch (_) {}
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     console.log("text mode recheive the chatId : ", chatId);
@@ -39,14 +68,25 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
 
     let currentChatId = chatId;
     if (!currentChatId) {
-      try {
-        const newChat = await chatService.createSession();
-        currentChatId = newChat.id;
-        window.history.replaceState(null, '', `/home/${currentChatId}`);
-        if (onSessionUpdate) onSessionUpdate(currentChatId, null);
-      } catch (err) {
-        console.error('Failed to create session:', err);
-        return;
+      let retries = 2;
+      while (retries > 0) {
+        try {
+          const newChat = await chatService.createSession();
+          currentChatId = newChat.id;
+          break;
+        } catch (err) {
+          retries--;
+          console.error('createSession failed', { status: err.response?.status, data: err.response?.data, msg: err.message, retries });
+          if (retries <= 0) {
+            setMessage(prev => [...prev, {
+              role: 'assistant',
+              content: 'Failed to create chat session. Please try again.',
+              timestamp: new Date().toISOString()
+            }]);
+            return;
+          }
+          await new Promise(r => setTimeout(r, 1000));
+        }
       }
     }
 
@@ -67,16 +107,14 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
         content: response.reply,
         timestamp: new Date().toISOString()
       }]);
-      onSessionUpdate(currentChatId, response);
-    } catch (error) {
-      console.error('Failed to send message:', error);
-      setMessage(prev => [...prev, {
-        role: 'assistant',
-        content: 'Sorry, something went wrong. Please try again.',
-        timestamp: new Date().toISOString()
-      }]);
-    } finally {
+      if (onSessionUpdate) onSessionUpdate(currentChatId, response);
+      if (chatId !== currentChatId) {
+        navigate(`/home/${currentChatId}`, { replace: true });
+      }
       setIsLoading(false);
+    } catch (error) {
+      console.error('sendMessage failed, polling:', error);
+      startPolling(currentChatId);
     }
   };
 

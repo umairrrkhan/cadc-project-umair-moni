@@ -1,4 +1,5 @@
 import React, { useState , useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import '../css/Sidebar.css';
 import {chatService } from '../service/chatService';
 
@@ -6,6 +7,7 @@ const Sidebar = ({ onNewChat }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [sessions, setSessions] = useState([]);
+    const location = useLocation();
 
     const loadSessions = async () => {
         try {
@@ -32,14 +34,8 @@ const Sidebar = ({ onNewChat }) => {
         'older': sessions.filter(c => new Date(c.createdAt) < lastWeek)
     };
 
-    const handleNewChatClick = async () => {
-        try{
-            const newSession = await chatService.createSession();
-            setSessions(prev => [newSession , ...prev]);
-            window.location.href = `/home/${newSession.id}`;
-        }catch(error){
-            console.error("failed to create new chat:" , error);
-        }
+    const handleNewChatClick = () => {
+        window.location.href = '/home';
     };
 
     const handleLogout = () => {
@@ -49,7 +45,7 @@ const Sidebar = ({ onNewChat }) => {
 
     useEffect(() => {
         loadSessions();
-    }, []);
+    }, [location.pathname]);
 
     return (
         <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
