@@ -108,6 +108,13 @@
   transition: background 0.15s, color 0.15s;
 }
 
+.conv-active.active{
+  background-color: #2b4b8c;
+  color:white;
+  font-weight: 400;
+  border-radius: 8px;
+}
+
 .conv-item:hover { background: #efefef; color: #111; }
 
 /* ── FOOTER ── */

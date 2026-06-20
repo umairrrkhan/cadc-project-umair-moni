@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import TextMode from '../components/TextMode';
@@ -10,6 +10,7 @@ import '../css/HomePage.css';
 const Homepage = () => {
   const navigate = useNavigate();
   const { chatId } = useParams();
+  const location = useLocation();
   const [mode, setMode] = React.useState('text');
 
   const handleNewChat = () => {
@@ -17,6 +18,10 @@ const Homepage = () => {
       .then(newChat => navigate(`/home/${newChat.id}`))
       .catch(err => console.error('failed to create the chat:', err));
   };
+
+  useEffect(() => {
+    setMode('text');
+  }, [chatId]);
 
   useEffect(() => {
     if (mode === 'text' && !chatId) {
@@ -33,7 +38,7 @@ const Homepage = () => {
         <Header mode={mode} setMode={setMode} />
         <div className="home-content">
           {mode === 'text'
-            ? <TextMode chatId={chatId} onSessionUpdate={(id, response) => console.log('session updated', id)} />
+            ? <TextMode key={location.pathname || chatId || 'no-chat'} chatId={chatId} onSessionUpdate={(id, response) => console.log('session updated', id)} />
             : <VisionMode />}
         </div>
       </div>

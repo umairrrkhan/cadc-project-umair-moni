@@ -1,12 +1,10 @@
 import React, { useState , useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../css/Sidebar.css';
 import {chatService } from '../service/chatService';
 
 const Sidebar = ({ onNewChat }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
-    const navigate = useNavigate();
     const [sessions, setSessions] = useState([]);
 
     const loadSessions = async () => {
@@ -38,8 +36,7 @@ const Sidebar = ({ onNewChat }) => {
         try{
             const newSession = await chatService.createSession();
             setSessions(prev => [newSession , ...prev]);
-            navigate(`/chat/${newSession.id}`);
-        if (onNewChat) onNewChat();
+            window.location.href = `/home/${newSession.id}`;
         }catch(error){
             console.error("failed to create new chat:" , error);
         }
@@ -47,7 +44,7 @@ const Sidebar = ({ onNewChat }) => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        navigate('/login');
+        window.location.href = '/login';
     };
 
     useEffect(() => {
@@ -71,15 +68,22 @@ const Sidebar = ({ onNewChat }) => {
                             items.length > 0 ? (
                                 <div key={label} className="conv-group">
                                     <p className="conv-group-label">{label}</p>
-                                    {items.map((conv, i) => (
+                                    {items.map((conv, i) => {
+                                        const isActive = window.location.pathname === `/home/${conv.id}`;
+                                        return (
                                         <div
                                             key={i}
-                                            className="conv-item"
-                                            onClick={() => navigate(`/chat/${conv.id}`)}
+                                            className={`conv-item ${isActive ? 'active' : ''}`}
+                                            onClick={() => {
+                                                if (!conv.id) return;
+                                                console.log('Clicked chat ID:', conv.id);
+                                                window.location.href = `/home/${conv.id}`;
+                                          }}
                                         >
                                             {conv.title}
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : null
                         )}
@@ -92,7 +96,7 @@ const Sidebar = ({ onNewChat }) => {
                         </div>
                         {showProfile && (
                             <div className="profile-dropdown">
-                                <div className="profile-dropdown-item" onClick={() => navigate('/profile')}>
+                                <div className="profile-dropdown-item" onClick={() => { window.location.href = '/profile'; }}>
                                     Profile
                                 </div>
                                 <div className="profile-dropdown-item" onClick={handleLogout}>

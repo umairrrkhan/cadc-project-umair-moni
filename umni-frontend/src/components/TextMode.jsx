@@ -14,11 +14,19 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
   };
 
   useEffect(() => {
+    console.log("text mode recheive the chatId : ", chatId);
     if (chatId) {
       chatService.getMessages(chatId)
-        .then(data => setMessage(data))
-        .catch(err => console.error('Failed to fetch messages:', err));
+        .then(data => {
+          const msgs = Array.isArray(data) ? data : [];
+          console.log('message loaded', msgs.length);
+          setMessage(msgs);
+    })
+        .catch(err =>{ 
+          console.error('Failed to fetch messages:', chatId ,err);
+        });
     } else {
+      console.log("no chatid provided clearing messages")
       setMessage([]);
     }
   }, [chatId]);
@@ -122,7 +130,6 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input bar */}
       <div className="chat-input-bar">
         <form onSubmit={handleSubmit} className="chat-input-form">
           <textarea
