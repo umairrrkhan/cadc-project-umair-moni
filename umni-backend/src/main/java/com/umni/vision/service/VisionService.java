@@ -13,6 +13,10 @@ public class VisionService {
 	private final String apiKey;
 	private final String model;
 	
+	private static final String DEFAULT_PROMPT = "replace the ? with the correct value written in red";
+	
+			
+	
 	
 	public VisionService(WebClient.Builder webClientBuilder,  
 			@Value("${gemini.api.key}") String apiKey,
@@ -25,9 +29,8 @@ public class VisionService {
 	}
 	
 	public Mono<String> solveMathProblem(String base64Image){
-		 String prompt ="replace the ? with the correct value written in red";
 		 
-		 Map<String , Object> request = buildGeminiRequest(base64Image, prompt);
+		 Map<String , Object> request = buildGeminiRequest(base64Image);
 		 
 		 return webClient.post()
 				 .uri(uriBuilder -> uriBuilder
@@ -38,12 +41,12 @@ public class VisionService {
 				 .bodyValue(request)
 				 .retrieve()
 				 .bodyToMono(Map.class)
-				 .map(response -> extractGeneratedImage(response));
+				 .map(this::extractGeneratedImage);
 		
 	}
 	
-	private Map<String , Object> buildGeminiRequest(String base64Image , String prompt){
-		Map<String , Object> part1 = Map.of("text",prompt);
+	private Map<String , Object> buildGeminiRequest(String base64Image){
+		Map<String , Object> part1 = Map.of("text",DEFAULT_PROMPT);
 		Map<String , Object> part2 = Map.of(
 				"inlineData", Map.of(
 						"mimeType", "image/png",
@@ -65,6 +68,30 @@ public class VisionService {
 				
 	}
 	
+	@SuppressWarnings("unchecked")
+	private String extractGeneratedImage(Map<String, Object> response) {
+        try {
+            List<Map<String, Object>> candidates = 
+                (List<Map<String, Object>>) response.get("candidates");
+            
+            if (candidates != null && !candidates.isEmpty()) {
+                Map<String, Object> content = 
+                    (Map<String, Object>) candidates.get(0).get("content");
+                List<Map<String, Object>> parts = 
+                    (List<Map<String, Object>>) content.get("parts");
+                
+                for (Map<String, Object> part : parts) {
+                    if (part.containsKey("inlineData")) {
+                        Map<String, String> inlineData = 
+                            (Map<String, String>) part.get("inlineData");
+                        return inlineData.get("data");
+                    }
+                }
+            }return null;
 	
-
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return null;
+        }
+	}
 }
