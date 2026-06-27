@@ -34,6 +34,10 @@ public class Vision {
 	
 	private Instant createdAt;
     private Instant updatedAt;
+    
+    public Vision() {
+    }
+    
 	public String getId() {
 		return id;
 	}

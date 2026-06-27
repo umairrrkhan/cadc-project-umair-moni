@@ -36,6 +36,62 @@ public class VisionController {
         this.visionRepository = visionRepository;
     }
     
-    private String getCurrentUserI
+    private String getCurrentUserId() {
+    	Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    	if(auth == null) throw new RuntimeException("not autheticated");
+    	
+    	Object details = auth.getDetails();
+    	if (details instanceof Map<?, ?> map) {
+    	    String userId = (String) map.get("userId");
+    	    if (userId != null) {
+    	        return userId;
+    	    }
+    	}
+    	
+    	throw new RuntimeException("User id not found");
+    }
+    
+    @PostMapping("/solve")
+    public Mono<ResponseEntity<Map<String, Object>>> solveMathProblem(
+    		@RequestBody Map<String , Object> request ){
+    
+    	
+    	String userId = getCurrentUserId();
+    	String base64Image = String.valueOf(request.get("image"));
+        
+        if(base64Image != null && base64Image.contains(",")) {
+        	base64Image = base64Image.substring(base64Image.indexOf(",")+1);
+        }
+        
+        return visionService.solveMathProblem(base64Image)
+        		.map(generatedBase64 ->{
+        			byte[] imageBytes = Base64.getDecoder().decode(generatedBase64);
+        			
+        			String imageUrl = s3Service.uploadImage(imageBytes , userId , "solved");
+        			
+        			Vision vision = new Vision();
+        			vision.setUserId(userId);
+        			vision.setTitle("solved "+Instant.now().toString());
+        			vision.setSolvedImageKey(imageUrl);
+        			vision.setCreatedAt(Instant.now());
+        			vision.setUpdatedAt(Instant.now());
+        			visionRepository.save(vision);
+        			
+        			Map<String, Object> response = new java.util.HashMap<>();
+        			response.put("success", true);
+        			response.put("imageurl", imageUrl);
+        			response.put("visionid", vision.getId());
+
+        			return ResponseEntity.ok(response);
+        			
+        		})
+        		
+        		.onErrorResume(error -> {
+        			return Mono.just(ResponseEntity.badRequest().body(
+        					Map.of("success" , false , "error " , error.getMessage())
+        					));
+        		});
+    	
+    }
 
 }
