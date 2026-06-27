@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import '../css/VisionMode.css';
 
+import {visionService} from '../service/visionService';
+
 const VisionMode = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
