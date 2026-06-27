@@ -6,6 +6,8 @@ import {visionService} from '../service/visionService';
 const VisionMode = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [isSolving, setIsSolving] = useState(false);
+  const [error, setError] = useState(null);
 
   const [color, setColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(3);
@@ -169,6 +171,7 @@ const VisionMode = () => {
     reader.onload = (ev) => {
       setUploadedImage(ev.target.result);
       setShowUpload(false);
+      setError(null);
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -182,6 +185,7 @@ const VisionMode = () => {
     reader.onload = (ev) => {
       setUploadedImage(ev.target.result);
       setShowUpload(false);
+      setError(null);
     };
     reader.readAsDataURL(file);
   };
@@ -199,6 +203,55 @@ const VisionMode = () => {
     ctx.fillRect(0, 0, w, h);
     ctx.strokeStyle = color;
     ctx.lineWidth = brushSize;
+  };
+
+   const handleSolve = async () => {
+    if (isSolving) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError('Canvas not available. Please refresh and try again.');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    let hasContent = false;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+      if (r < 250 || g < 250 || b < 250) {
+        hasContent = true;
+        break;
+      }
+    }
+
+    if (!hasContent) {
+      setError('Please draw something on the canvas first!');
+      return;
+    }
+
+    setIsSolving(true);
+    setError(null);
+    setGeneratedImage(null);
+
+    try {
+      const imageDataUrl = canvas.toDataURL('image/png');
+       const result = await visionService.solveProblem(imageDataUrl);
+
+      if (result.success) {
+        setGeneratedImage(result.imageurl);
+        } else {
+        setError(result.error || 'Failed to solve the problem. Please try again.');
+      }
+    } catch (err) {
+      console.error('Solve error:', err);
+      setError(err.message || 'Something went wrong. Check if backend is running.');
+    } finally {
+      setIsSolving(false);
+    }
   };
 
   const triggerUpload = () => {
@@ -353,12 +406,25 @@ const VisionMode = () => {
       </div>
 
       <div className="solve-section">
-        <button className="solve-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="9 11 12 14 22 4"/>
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-        </svg>
-          Solve This Image
+        <button 
+          className={`solve-btn ${isSolving ? 'solving' : ''}`} 
+          onClick={handleSolve}
+          disabled={isSolving}
+        >
+          {isSolving ? (
+            <>
+              <span className="spinner-small"></span>
+              Solving...
+            </>
+          ) : (
+            <>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 11 12 14 22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+              Solve This Image
+            </>
+          )}
         </button>
       </div>
     </div>

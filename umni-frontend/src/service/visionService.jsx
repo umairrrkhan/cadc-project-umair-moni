@@ -1,9 +1,8 @@
 import api from './api';
 
 export const visionService={
-    solveProblem : async (imageData ,prompt = null ) =>{
+    solveProblem : async (imageData ) =>{
         const payload = {image : imageData };
-        if(prompt) payload.prompt = prompt;
 
         const response = await api.post('/vision/solve',payload);
         return response.data;
