@@ -93,5 +93,36 @@ public class VisionController {
         		});
     	
     }
+    
+    @GetMapping("/library")
+    public ResponseEntity<?> getUserLibrary(){
+    	String userId = getCurrentUserId();
+    	var images = visionRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    	return ResponseEntity.ok(Map.of(
+    			"images" ,images,
+    			"count", images.size()
+    			));
+    }
+    
+    @DeleteMapping("/{visionId}")
+    public ResponseEntity<?> deleteVision(@PathVariable String visionId) {
+        String userId = getCurrentUserId();
+        Vision vision = visionRepository.findById(visionId)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        if (!vision.getUserId().equals(userId)) {
+            return ResponseEntity.status(403).body("Unauthorized");
+        }
+
+        String key = vision.getSolvedImageKey()
+                .replace("https://umni-vision-images.s3.amazonaws.com/", "");
+        s3Service.deleteImage(key);
+
+        visionRepository.deleteById(visionId);
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+    
+    
 
 }
