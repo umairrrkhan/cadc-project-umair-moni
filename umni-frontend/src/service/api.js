@@ -8,12 +8,19 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
+        console.log(' Token from localStorage:', token ? 'EXISTS' : ' MISSING');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('Request headers:', config.headers);
+        }else {
+            console.log('No token found!');
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) =>{
+        console.error('Request interceptor error:', error);
+        return Promise.reject(error)
+    } 
 );
 
 api.interceptors.response.use(

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { visionService } from '../service/visionService';
 import { useNavigate } from 'react-router-dom';
-import '../css/LibraryPage.css';
 
 const LibraryPage = () => {
     const [images, setImages] = useState([]);

@@ -40,6 +40,10 @@ const Sidebar = ({ onNewChat }) => {
         navigate('/home')
     };
 
+    const handleLibraryClick = () => {
+        navigate('/library');
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         navigate('/login');
@@ -76,6 +80,12 @@ const Sidebar = ({ onNewChat }) => {
             </div>
             {!collapsed && (
                 <>
+                    <button
+                        className={`library-btn ${location.pathname === '/library' ? 'active-library-btn' : ''}`}
+                        onClick={handleLibraryClick}
+                    >
+                        Library
+                    </button>
                     <button className='new-chat-btn' onClick={handleNewChatClick}>+ New Chat</button>
                     <div className="conversation-list">
                         {Object.entries(grouped).map(([label, items]) =>

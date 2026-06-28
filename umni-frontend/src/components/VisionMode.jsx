@@ -6,6 +6,7 @@ import {visionService} from '../service/visionService';
 const VisionMode = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [replyText, setReplyText] = useState(null);
   const [isSolving, setIsSolving] = useState(false);
   const [error, setError] = useState(null);
 
@@ -206,7 +207,10 @@ const VisionMode = () => {
   };
 
    const handleSolve = async () => {
-    if (isSolving) return;
+    if (isSolving)  {
+        console.log('Already solving, please wait...');
+        return;
+    }
 
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -233,24 +237,37 @@ const VisionMode = () => {
       return;
     }
 
+    console.log('Starting solve process...');
+    console.log('Token exists?', !!localStorage.getItem('token'));
+
     setIsSolving(true);
     setError(null);
     setGeneratedImage(null);
+    setReplyText(null);
 
     try {
       const imageDataUrl = canvas.toDataURL('image/png');
-       const result = await visionService.solveProblem(imageDataUrl);
+      console.log('Image data length:', imageDataUrl.length);
+
+      console.log('Calling /api/vision/solve...');
+      const result = await visionService.solveProblem(imageDataUrl);
+      console.log('Response received:', result);
 
       if (result.success) {
-        setGeneratedImage(result.imageurl);
+        setGeneratedImage(result.imageurl || null);
+        console.log('Image generated successfully!');
+        setReplyText(result.reply || null);
+        setError(null);
         } else {
+          console.error(' API returned error:', result);
         setError(result.error || 'Failed to solve the problem. Please try again.');
       }
     } catch (err) {
       console.error('Solve error:', err);
-      setError(err.message || 'Something went wrong. Check if backend is running.');
+      setError(err.response?.data?.error || err.message || 'Something went wrong. Check if backend is running.');
     } finally {
       setIsSolving(false);
+      console.log('Solve process complete.');
     }
   };
 
@@ -384,6 +401,10 @@ const VisionMode = () => {
                 alt="AI Generated"
                 className="card-image"
               />
+            ) : replyText ? (
+              <div className="card-placeholder">
+                <p className="placeholder-text">{replyText}</p>
+              </div>
             ) : (
               <div className="card-placeholder">
                 <div className="placeholder-icon">
@@ -404,6 +425,17 @@ const VisionMode = () => {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="vision-error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="solve-section">
         <button 

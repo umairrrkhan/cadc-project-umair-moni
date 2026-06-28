@@ -19,8 +19,6 @@ import com.umni.vision.repository.VisionRepository;
 
 @RestController
 @RequestMapping("/api/vision")
-@CrossOrigin(origins = "http://localhost:3000")
-
 public class VisionController {
 	
 	private final VisionService visionService;
@@ -41,9 +39,11 @@ public class VisionController {
     	if(auth == null) throw new RuntimeException("not autheticated");
     	
     	Object details = auth.getDetails();
-    	if (details instanceof Map<?, ?> map) {
+    	if (details instanceof Map) {
+    	    Map<String, Object> map = (Map<String, Object>) details;
     	    String userId = (String) map.get("userId");
     	    if (userId != null) {
+    	        System.out.println("VISION userId from map: " + userId);
     	        return userId;
     	    }
     	}
@@ -52,11 +52,12 @@ public class VisionController {
     }
     
     @PostMapping("/solve")
-    public Mono<ResponseEntity<Map<String, Object>>> solveMathProblem(
+    public Mono<Map<String, Object>> solveMathProblem(
     		@RequestBody Map<String , Object> request ){
     
-    	
+    	System.out.println("=== VISION SOLVE CALLED ===");
     	String userId = getCurrentUserId();
+    	System.out.println("userId: " + userId);
     	String base64Image = String.valueOf(request.get("image"));
         
         if(base64Image != null && base64Image.contains(",")) {
@@ -65,9 +66,23 @@ public class VisionController {
         
         return visionService.solveMathProblem(base64Image)
         		.map(generatedBase64 ->{
+                    System.out.println("Generated base64 length: " + (generatedBase64 != null ? generatedBase64.length() : "null"));
+        		    if (generatedBase64 == null || generatedBase64.isEmpty()) {
+        		        Map<String, Object> err = new java.util.HashMap<>();
+        		        err.put("success", false);
+        		        err.put("error", "AI could not generate a solution image");
+        		        return err;
+        		    }
         			byte[] imageBytes = Base64.getDecoder().decode(generatedBase64);
         			
-        			String imageUrl = s3Service.uploadImage(imageBytes , userId , "solved");
+        			String imageUrl;
+                    try {
+                        imageUrl = s3Service.uploadImage(imageBytes , userId , "solved");
+                        System.out.println("Uploaded image to S3: " + imageUrl);
+                    } catch (Exception s3Error) {
+                        System.out.println("S3 upload failed, falling back to Base64 data URL: " + s3Error.getMessage());
+                        imageUrl = "data:image/png;base64," + generatedBase64;
+                    }
         			
         			Vision vision = new Vision();
         			vision.setUserId(userId);
@@ -76,20 +91,24 @@ public class VisionController {
         			vision.setCreatedAt(Instant.now());
         			vision.setUpdatedAt(Instant.now());
         			visionRepository.save(vision);
+                    System.out.println("Saved vision entity to database: " + vision.getId());
         			
         			Map<String, Object> response = new java.util.HashMap<>();
         			response.put("success", true);
         			response.put("imageurl", imageUrl);
         			response.put("visionid", vision.getId());
 
-        			return ResponseEntity.ok(response);
+        			return response;
         			
         		})
         		
         		.onErrorResume(error -> {
-        			return Mono.just(ResponseEntity.badRequest().body(
-        					Map.of("success" , false , "error " , error.getMessage())
-        					));
+                    System.out.println("VisionController error caught:");
+                    error.printStackTrace();
+        			Map<String, Object> errMap = new java.util.HashMap<>();
+        			errMap.put("success", false);
+        			errMap.put("error", error.getMessage());
+        			return Mono.just(errMap);
         		});
     	
     }
@@ -114,9 +133,15 @@ public class VisionController {
             return ResponseEntity.status(403).body("Unauthorized");
         }
 
-        String key = vision.getSolvedImageKey()
-                .replace("https://umni-vision-images.s3.amazonaws.com/", "");
-        s3Service.deleteImage(key);
+        String key = vision.getSolvedImageKey();
+        if (key != null && key.startsWith("https://")) {
+            String s3Key = key.replace("https://umni-vision-images.s3.amazonaws.com/", "");
+            try {
+                s3Service.deleteImage(s3Key);
+            } catch (Exception e) {
+                System.out.println("Failed to delete image from S3: " + e.getMessage());
+            }
+        }
 
         visionRepository.deleteById(visionId);
 

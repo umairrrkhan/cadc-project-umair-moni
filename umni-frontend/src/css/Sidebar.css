@@ -55,9 +55,10 @@
 
 .sidebar-icons button:hover { background: #f0f0f0; color: #111; }
 
-/* ── NEW CHAT BTN ── */
+/* ── ACTION BTNS ── */
+.library-btn,
 .new-chat-btn {
-  margin: 12px;
+  margin: 12px 12px 8px;
   padding: 9px 14px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
@@ -72,7 +73,16 @@
   font-family: inherit;
 }
 
+.library-btn:hover,
 .new-chat-btn:hover { background: #f5f5f5; border-color: #d1d5db; }
+
+.library-btn.active-library-btn {
+  background: #2b4b8c;
+  color: #fff;
+  border-color: #2b4b8c;
+}
+
+.new-chat-btn { margin: 0 12px 12px; }
 
 .conversation-list {
   flex: 1;
