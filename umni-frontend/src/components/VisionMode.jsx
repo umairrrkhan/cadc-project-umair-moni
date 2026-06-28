@@ -277,7 +277,7 @@ const VisionMode = () => {
 
   return (
     <div className="vision-wrapper">
-      <h2 className="vision-title">AI Vision Studio</h2>
+      <h2 className="vision-title">Vision mode</h2>
 
       <div className="vision-panels">
         <div className="vision-card card-draw">

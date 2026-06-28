@@ -29,10 +29,15 @@ const CreateAccountPage = () => {
       );
       localStorage.setItem("token", response.data.token);
       setMessage("Account created successfully!");
+      setError("");
       setTimeout(()=> window.location.href = "/home", 2000);
     } catch (error) {
-      console.error("Full error:", error.response);
-      setMessage("Error creating account. Please try again.");
+      console.error("Full signup error:", error);
+      const errMsg = error.response?.data?.error || error.message || "Error creating account. Please try again.";
+      setError(errMsg);
+      setMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,12 +68,14 @@ const CreateAccountPage = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md"
+            disabled={loading}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md disabled:bg-blue-300"
           >
-            Create Account
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
-        {message && <p className="text-green-500 mt-4">{message}</p>}
+        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+        {message && <p className="text-green-500 text-sm mt-4 text-center">{message}</p>}
         <a href="/login" className="text-blue-500 mt-4 block text-center">Already have an account? Log in</a>
       </div>
     </div>

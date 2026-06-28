@@ -106,10 +106,22 @@ public class ChatController {
 		 
 		 chatSessionRepository.save(session);
 		 
-		 List<Message> previousMessages = messageRepository.findByChatIdAndDeletedFalseOrderByCreatedAtAsc(chatId);
-		 List<Map<String, String>> conversationHistory = previousMessages.stream()
-	                .map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
-	                .toList();
+				 List<Message> previousMessages = messageRepository.findByChatIdAndDeletedFalseOrderByCreatedAtAsc(chatId);
+		 List<Map<String, String>> conversationHistory = new java.util.ArrayList<>();
+		 
+		 String systemPrompt = "You are UmNi AI, a helpful, precise, and clean assistant specialized in mathematics, logic, coding, and general instruction.\n" +
+		         "When answering users:\n" +
+		         "1. ALWAYS write mathematical formulas cleanly and use standard LaTeX markdown formatting.\n" +
+		         "2. Use display math block format enclosed in '$$' for isolated equations (e.g. $$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$).\n" +
+		         "3. Use inline math format enclosed in '$' for equations within text sentences (e.g. $E = mc^2$).\n" +
+		         "4. Keep explanations clear, well-structured, and use markdown lists or headers where appropriate.\n" +
+		         "5. Never output HTML tags. Only output standard clean markdown and LaTeX math.";
+		 
+		 conversationHistory.add(Map.of("role", "system", "content", systemPrompt));
+		 
+		 for (Message msg : previousMessages) {
+		     conversationHistory.add(Map.of("role", msg.getRole(), "content", msg.getContent()));
+		 }
 		 
 		 return deepSeekService.getChatCompletionWithHistory(conversationHistory)
 	                .map(aiReply -> {

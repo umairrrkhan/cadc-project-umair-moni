@@ -148,7 +148,9 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
               <div className="bubble-label">
                 {msg.role === 'user' ? 'You' : 'UmNi'}
               </div>
-              <p>{msg.content}</p>
+              <div className="message-formatted-body">
+                {renderFormattedMessage(msg.content)}
+              </div>
             </div>
           </div>
         ))}
@@ -192,6 +194,100 @@ const TextMode = ({ chatId, onSessionUpdate }) => {
       </div>
     </div>
   );
+};
+
+const parseInlineMarkdown = (text) => {
+  if (!text) return '';
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    const subParts = part.split(/(\*.*?\*|`.*?`)/g);
+    return subParts.map((subPart, subIndex) => {
+      if (subPart.startsWith('*') && subPart.endsWith('*')) {
+        return <em key={`${index}-${subIndex}`}>{subPart.slice(1, -1)}</em>;
+      }
+      if (subPart.startsWith('`') && subPart.endsWith('`')) {
+        return <code key={`${index}-${subIndex}`} className="inline-code">{subPart.slice(1, -1)}</code>;
+      }
+      return subPart;
+    });
+  });
+};
+
+const formatTextWithMarkdown = (text, keyPrefix) => {
+  const lines = text.split('\n');
+  return (
+    <div key={keyPrefix} className="text-paragraphs">
+      {lines.map((line, lineIndex) => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('### ')) {
+          return <h3 key={lineIndex}>{parseInlineMarkdown(trimmed.slice(4))}</h3>;
+        }
+        if (trimmed.startsWith('## ')) {
+          return <h2 key={lineIndex}>{parseInlineMarkdown(trimmed.slice(3))}</h2>;
+        }
+        if (trimmed.startsWith('# ')) {
+          return <h1 key={lineIndex}>{parseInlineMarkdown(trimmed.slice(2))}</h1>;
+        }
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          return <li key={lineIndex} className="list-item">{parseInlineMarkdown(trimmed.slice(2))}</li>;
+        }
+        if (trimmed.length === 0) {
+          return <div key={lineIndex} className="line-break" />;
+        }
+        return <p key={lineIndex}>{parseInlineMarkdown(line)}</p>;
+      })}
+    </div>
+  );
+};
+
+const renderFormattedMessage = (content) => {
+  if (!content) return null;
+
+  const parts = content.split(/(```[\s\S]*?```)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith('```')) {
+      const match = part.match(/```(\w*)\n([\s\S]*?)```/);
+      const language = match ? match[1] : '';
+      const code = match ? match[2] : part.slice(3, -3).trim();
+      return (
+        <pre key={index} className="code-block">
+          {language && <div className="code-lang">{language}</div>}
+          <code>{code}</code>
+        </pre>
+      );
+    }
+
+    const subParts = part.split(/(\$\$[\s\S]*?\$\$)/g);
+    return subParts.map((subPart, subIndex) => {
+      if (subPart.startsWith('$$') && subPart.endsWith('$$')) {
+        const math = subPart.slice(2, -2).trim();
+        return (
+          <div key={`${index}-${subIndex}`} className="math-block">
+            {math}
+          </div>
+        );
+      }
+
+      const inlineParts = subPart.split(/(\$[^\$]*?\$|\\\(.*?\\\))/g);
+      return inlineParts.map((inlinePart, inlineIndex) => {
+        if ((inlinePart.startsWith('$') && inlinePart.endsWith('$')) || 
+            (inlinePart.startsWith('\\(') && inlinePart.endsWith('\\)'))) {
+          const math = inlinePart.startsWith('$') ? inlinePart.slice(1, -1).trim() : inlinePart.slice(2, -2).trim();
+          return (
+            <span key={`${index}-${subIndex}-${inlineIndex}`} className="math-inline">
+              {math}
+            </span>
+          );
+        }
+
+        return formatTextWithMarkdown(inlinePart, `${index}-${subIndex}-${inlineIndex}`);
+      });
+    });
+  });
 };
 
 export default TextMode;
