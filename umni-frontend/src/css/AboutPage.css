@@ -80,19 +80,12 @@
   width: 100%;
   max-width: 800px;
   background: #f8fafc;
-  border: 2px solid #000000;
   border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
   aspect-ratio: 1.6;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
-}
-
-.about-image-box:hover {
-  transform: scale(1.01);
 }
 
 .about-img {
