@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import UserProfilePage from './pages/userProfilePage';
 import LibraryPage from './pages/LibraryPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {
     const token = localStorage.getItem('token');
@@ -21,8 +22,9 @@ function App() {
                 <Route path="/profile" element={token ? <UserProfilePage/> : <Navigate to="/login" />} />
                 <Route path="/chat/:chatId" element={token ? <HomePage/> : <Navigate to="/login" />} />
                 <Route path="/login" element={<LoginPage/>} />
-                <Route path="*" element={<Navigate to="/login" />} />
                 <Route path="/library" element={token ? <LibraryPage/> : <Navigate to="/login" />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
         </BrowserRouter>
     );

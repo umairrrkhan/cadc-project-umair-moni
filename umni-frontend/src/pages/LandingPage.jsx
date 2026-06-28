@@ -54,7 +54,7 @@ const LandingPage = () => {
         <nav className="lp-nav">
           <a href="#features">Features</a>
           <a href="#how-it-works">How it works</a>
-          <a href="#about">About</a>
+          <Link to="/about">About</Link>
         </nav>
 
         <div className="lp-header-right">
