@@ -15,6 +15,14 @@ public class Note {
 	@Column(name = "user_id" , nullable = false , length = 100)
 	private String userId;
 	
+	public String getS3Key() {
+		return s3Key;
+	}
+
+	public void setS3Key(String s3Key) {
+		this.s3Key = s3Key;
+	}
+
 	@Column(name = "file_name", nullable = false, length = 255)
     private String fileName;
 
@@ -23,6 +31,9 @@ public class Note {
 
     @Column(name = "s3_url", nullable = false, length = 500)
     private String s3Url;
+    
+    @Column(name = "s3_key", nullable = false, length = 500)
+    private String s3Key;
 
     @Column(name = "uploaded_at", nullable = false)
     private Instant uploadedAt;

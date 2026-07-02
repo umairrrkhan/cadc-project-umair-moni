@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notes/internal")
+@RequestMapping("/api/notes")
 public class NoteController {
 	
 	private final NoteRepository noteRepository;
@@ -46,6 +46,7 @@ public class NoteController {
             note.setFileName(originalName);
             note.setFileType(contentType);
             note.setS3Url(fileUrl);
+            note.setS3Key(key);
             note.setUploadedAt(Instant.now());
             
             noteRepository.save(note);
@@ -73,6 +74,12 @@ public class NoteController {
 	            return ResponseEntity.status(403).body("Unauthorized");
 	        }
 	        
+	        try {
+	            s3Service.deleteFile(note.getS3Key());
+	        } catch (Exception e) {
+	            System.out.println("S3 delete failed (may already be deleted): " + e.getMessage());
+	        }
+	        
 	        String bucket = s3Service.getBucketName();
 	        
 	        String prefix = "https://" + bucket + ".s3.amazonaws.com/";
@@ -86,4 +93,25 @@ public class NoteController {
 	        return ResponseEntity.ok().build();
 
 
-}}
+}
+		@PostMapping("/internal/upload")
+	    public ResponseEntity<?> internalUploadNote(
+	            @RequestParam("userId") String userId,
+	            @RequestParam("file") MultipartFile file) {
+	        return uploadNote(userId, file);
+	    }
+		
+		@GetMapping("/internal/user/{userId}")
+	    public ResponseEntity<List<Note>> internalGetUserNotes(@PathVariable String userId) {
+	        return ResponseEntity.ok(noteRepository.findByUserIdOrderByUploadedAtDesc(userId));
+	    }
+		
+		@DeleteMapping("/internal/{noteId}")
+	    public ResponseEntity<?> internalDeleteNote(
+	            @PathVariable String noteId,
+	            @RequestParam("userId") String userId) {
+	        return deleteNote(noteId, userId);
+	    }
+		
+
+}
