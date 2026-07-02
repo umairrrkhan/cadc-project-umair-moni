@@ -87,6 +87,7 @@ const Sidebar = ({ onNewChat }) => {
                         Library
                     </button>
                     <button className='new-chat-btn' onClick={handleNewChatClick}>+ New Chat</button>
+                    <button className={`library-btn ${location.pathname === '/notes' ? 'active-library-btn' : ''}`} onClick={() => navigate('/notes')}>Notes Vault</button>
                     <div className="conversation-list">
                         {Object.entries(grouped).map(([label, items]) =>
                             items.length > 0 ? (

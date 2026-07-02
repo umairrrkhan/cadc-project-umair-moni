@@ -25,6 +25,7 @@ function App() {
                 <Route path="/library" element={token ? <LibraryPage/> : <Navigate to="/login" />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="*" element={<Navigate to="/login" />} />
+                <Route path="/notes" element={token ? <NotesPage /> : <Navigate to="/login" />} />
             </Routes>
         </BrowserRouter>
     );
