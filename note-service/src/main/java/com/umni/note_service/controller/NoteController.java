@@ -73,7 +73,12 @@ public class NoteController {
 	            return ResponseEntity.status(403).body("Unauthorized");
 	        }
 	        
-	        String key = note.getS3Url().replace("https://" + s3Service.getBucketName() + ".s3.amazonaws.com/", "");
+	        String bucket = s3Service.getBucketName();
+	        
+	        String prefix = "https://" + bucket + ".s3.amazonaws.com/";
+	        
+	        String key = note.getS3Url().replace(prefix, "");
+	        
 	        s3Service.deleteFile(key);
 	        
 	        noteRepository.deleteById(noteId);

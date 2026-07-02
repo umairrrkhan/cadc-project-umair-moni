@@ -33,6 +33,10 @@ public class S3StorageService {
          .build();
     }
 	
+	public String getBucketName() {
+        return bucketName;
+    }
+	
 	public String uploadFile(byte[] fileData, String key , String contentType) {
 		PutObjectRequest request = PutObjectRequest.builder()
 				.bucket(bucketName)
