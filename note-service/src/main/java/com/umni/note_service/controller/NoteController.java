@@ -11,8 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -26,13 +30,30 @@ public class NoteController {
         this.s3Service = s3Service;
     }
 	
+	private String getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+        Object details = auth.getDetails();
+        if (details instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) details;
+            String userId = (String) map.get("userId");
+            if (userId != null) {
+                return userId;
+            }
+        }
+        throw new RuntimeException("User ID not found in JWT");
+    }
+	
 	@PostMapping("/upload")
 	
 	public ResponseEntity<?> uploadNote(
-			@RequestParam("userId") String userId,
 			@RequestParam("file") MultipartFile file
 			){
 		try {
+			
+			String userId = getCurrentUserId(); 
 			
 			String originalName = file.getOriginalFilename();
             String contentType = file.getContentType();
@@ -60,7 +81,7 @@ public class NoteController {
 		
 	}
 		
-		@GetMapping("/user/{userId}")
+	    @GetMapping("/list")
 	    public ResponseEntity<List<Note>> getUserNotes(@PathVariable String userId) {
 	        return ResponseEntity.ok(noteRepository.findByUserIdOrderByUploadedAtDesc(userId));
 	    }
@@ -98,8 +119,29 @@ public class NoteController {
 	    public ResponseEntity<?> internalUploadNote(
 	            @RequestParam("userId") String userId,
 	            @RequestParam("file") MultipartFile file) {
-	        return uploadNote(userId, file);
-	    }
+			
+			try {
+	                String originalName = file.getOriginalFilename();
+	                String contentType = file.getContentType();
+	                byte[] bytes = file.getBytes();
+
+	                String key = "notes/" + userId + "/" + System.currentTimeMillis() + "_" + originalName;
+	                String fileUrl = s3Service.uploadFile(bytes, key, contentType);
+
+	                Note note = new Note();
+	                note.setUserId(userId);
+	                note.setFileName(originalName);
+	                note.setFileType(contentType);
+	                note.setS3Url(fileUrl);
+	                note.setS3Key(key);
+	                note.setUploadedAt(Instant.now());
+
+	                noteRepository.save(note);
+	                return ResponseEntity.ok(note);
+	            } catch (Exception e) {
+	                return ResponseEntity.status(500).body("Internal upload failed: " + e.getMessage());
+	            }
+}
 		
 		@GetMapping("/internal/user/{userId}")
 	    public ResponseEntity<List<Note>> internalGetUserNotes(@PathVariable String userId) {
@@ -109,9 +151,17 @@ public class NoteController {
 		@DeleteMapping("/internal/{noteId}")
 	    public ResponseEntity<?> internalDeleteNote(
 	            @PathVariable String noteId,
-	            @RequestParam("userId") String userId) {
-	        return deleteNote(noteId, userId);
+	            @RequestParam("userId") String userId)  {
+	        Note note = noteRepository.findById(noteId)
+	                .orElseThrow(() -> new RuntimeException("Note not found"));
+
+	        if (!note.getUserId().equals(userId)) {
+	            return ResponseEntity.status(403).body("Unauthorized");
+	        }
+
+	        s3Service.deleteFile(note.getS3Key());
+	        noteRepository.deleteById(noteId);
+	        return ResponseEntity.ok().build();
 	    }
-		
 
 }
