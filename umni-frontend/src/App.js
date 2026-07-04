@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import UserProfilePage from './pages/userProfilePage';
 import LibraryPage from './pages/LibraryPage';
 import AboutPage from './pages/AboutPage';
+import NotesPage from './pages/NotesPage';
 
 function App() {
     const token = localStorage.getItem('token');
