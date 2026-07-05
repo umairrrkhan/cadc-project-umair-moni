@@ -82,14 +82,16 @@ public class NoteController {
 	}
 		
 	    @GetMapping("/list")
-	    public ResponseEntity<List<Note>> getUserNotes(@PathVariable String userId) {
+	    public ResponseEntity<List<Note>> getUserNotes() {
+	        String userId = getCurrentUserId();
 	        return ResponseEntity.ok(noteRepository.findByUserIdOrderByUploadedAtDesc(userId));
 	    }
 		
 		@DeleteMapping("/{noteId}")
-	    public ResponseEntity<?> deleteNote(@PathVariable String noteId, @RequestParam String userId) {
-	        Note note = noteRepository.findById(noteId)
-	                .orElseThrow(() -> new RuntimeException("Note not found"));
+	    public ResponseEntity<?> deleteNote(@PathVariable String noteId) {
+			String userId = getCurrentUserId();
+		    Note note = noteRepository.findById(noteId)
+		            .orElseThrow(() -> new RuntimeException("Note not found"));
 
 	        if (!note.getUserId().equals(userId)) {
 	            return ResponseEntity.status(403).body("Unauthorized");
