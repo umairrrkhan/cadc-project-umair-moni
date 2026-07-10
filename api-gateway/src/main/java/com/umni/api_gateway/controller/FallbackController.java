@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/fallback")
 public class FallbackController {
 	
-	@PostMapping("/core")
+	@RequestMapping("/core")
     public Map<String, String> coreFallback() {
         Map<String, String> response = new HashMap<>();
         response.put("error", "core service is temporarily unavailable please try again later.");
@@ -21,7 +21,7 @@ public class FallbackController {
     }
 	
 	
-	@PostMapping("/note")
+	@RequestMapping("/note")
     public Map<String, String> noteFallback() {
         Map<String, String> response = new HashMap<>();
         response.put("error", "note service is temporarily unavailable. your file upload may not have been saved.");

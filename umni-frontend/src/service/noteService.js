@@ -5,20 +5,18 @@ export const noteService = {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await api.post('/api/notes/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        const response = await api.post('/notes/upload', formData, {
+            timeout: 60000,
         });
         return response.data;
     },
     getNotes: async () => {
-        const response = await api.get('/api/notes/list');
+        const response = await api.get('/notes/list');
         return response.data;
     },
 
     deleteNote: async (noteId) => {
-        await api.delete(`/api/notes/${noteId}`);
+        await api.delete(`/notes/${noteId}`);
     }
 
 };
