@@ -75,6 +75,13 @@ public class ChatController {
 	
 	@GetMapping("/session/{chatId}/messages")
 	public List<Message> getSessionMessages(@PathVariable String chatId){
+		String userId = getCurrentUserId();
+		ChatSession session = chatSessionRepository.findById(chatId)
+				.orElseThrow(() -> new RuntimeException("session not found"));
+		
+		if(!session.getUserId().equals(userId)) {
+			throw new RuntimeException("unauthorized access to this session");
+		}
 		return messageRepository.findByChatIdAndDeletedFalseOrderByCreatedAtAsc(chatId);
 	}
 	
@@ -95,7 +102,11 @@ public class ChatController {
 		messageRepository.save(userMsg);
 		
 		
-		 ChatSession session = chatSessionRepository.findById(chatId).orElseThrow();
+		 ChatSession session = chatSessionRepository.findById(chatId).orElseThrow(() -> new RuntimeException("session not found "));
+		 
+		 if(!session.getUserId().equals(userId)) {
+			 throw new RuntimeException("unauthorized access to this session");
+		 }
 		 session.setUpdatedAt(now);
 		 
 		 // Set title from first user message
