@@ -43,6 +43,14 @@ public class JwtUtil {
                 .getPayload();
     }
     
+    public Claims parseToken(String token) {
+    	try {
+    		return extractAllClaims(token);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }
+    
     public boolean validateToken(String token) {
         try {
             extractAllClaims(token);
