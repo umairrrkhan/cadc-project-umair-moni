@@ -103,14 +103,6 @@ public class NoteController {
 	            System.out.println("S3 delete failed (may already be deleted): " + e.getMessage());
 	        }
 	        
-	        String bucket = s3Service.getBucketName();
-	        
-	        String prefix = "https://" + bucket + ".s3.amazonaws.com/";
-	        
-	        String key = note.getS3Url().replace(prefix, "");
-	        
-	        s3Service.deleteFile(key);
-	        
 	        noteRepository.deleteById(noteId);
 
 	        return ResponseEntity.ok().build();
