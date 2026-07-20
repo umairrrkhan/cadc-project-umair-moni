@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-
-import api from '../service/api';
+import "../css/LoginPage.css";
 
 const CreateAccountPage = () => {
   const [email, setEmail] = useState("");
@@ -15,9 +15,9 @@ const CreateAccountPage = () => {
     setError('');
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-    setError('Please enter a valid email address (eg = user@gmail.com)');
-    return;
-}
+      setError('Please enter a valid email address (eg = user@gmail.com)');
+      return;
+    }
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
@@ -31,7 +31,7 @@ const CreateAccountPage = () => {
       localStorage.setItem("token", response.data.token);
       setMessage("Account created successfully!");
       setError("");
-      setTimeout(()=> window.location.href = "/home", 2000);
+      setTimeout(() => window.location.href = "/home", 2000);
     } catch (error) {
       console.error("Full signup error:", error);
       const errMsg = error.response?.data?.error || error.message || "Error creating account. Please try again.";
@@ -43,43 +43,67 @@ const CreateAccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700">Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)} required 
-              className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            /><br />
+    <>
+      <header className="landing-header">
+        <a href="/" className="landing-logo"><span>◆</span> UmNi</a>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+          <a href="/login">Sign in</a>
+        </nav>
+      </header>
+      <div className="login-page" style={{ minHeight: 'calc(100vh - 64px)' }}>
+        <div className="login-brand">
+          <div className="login-brand-body" style={{ marginTop: 0 }}>
+            <h2>The AI math assistant<br />that reads your handwriting.</h2>
+            <p>Draw. Ask. Solve — in seconds.</p>
           </div>
-          <div>
-            <label className="block text-gray-700">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} required  
-              className="border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            /><br />
+        </div>
+
+        <div className="login-form-panel">
+          <div className="login-form-wrap">
+            <h1>Create account</h1>
+            <p className="login-sub">Start solving with AI</p>
+
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="login-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="login-field">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="At least 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && <p className="login-error">{error}</p>}
+              {message && <p className="login-error" style={{ color: '#16a34a' }}>{message}</p>}
+
+              <button type="submit" className="login-submit" disabled={loading}>
+                {loading ? 'Creating account…' : 'Create account →'}
+              </button>
+            </form>
+
+            <p className="login-footer-text">
+              Already have an account?{' '}
+              <Link to="/login">Sign in</Link>
+            </p>
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md disabled:bg-blue-300"
-          >
-            {loading ? "Creating..." : "Create Account"}
-          </button>
-        </form>
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
-        {message && <p className="text-green-500 text-sm mt-4 text-center">{message}</p>}
-        <a href="/login" className="text-blue-500 mt-4 block text-center">Already have an account? Log in</a>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

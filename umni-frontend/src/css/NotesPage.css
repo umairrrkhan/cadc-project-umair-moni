@@ -18,7 +18,7 @@
 }
 
 .back-btn {
-    background: #6c63ff;
+    background: #315ee8;
     color: white;
     border: none;
     padding: 0.5rem 1.2rem;
@@ -28,7 +28,7 @@
 }
 
 .back-btn:hover {
-    background: #5a52d5;
+    background: #2547b6;
 }
 
 .upload-section {
@@ -176,3 +176,6 @@
     padding: 3rem;
     color: #888;
 }
+
+.notes-page{max-width:none;min-height:100vh;padding:56px clamp(22px,6vw,82px);background:#f8f7f2;color:#172033}.notes-header{max-width:1120px;margin:0 auto 28px;padding-bottom:22px;border-bottom:1px solid #dfe2da}.notes-header h2{font:600 clamp(31px,4vw,46px)/1.05 Georgia,serif;font-size:0}.notes-header h2:after{content:'Notes vault';font-size:clamp(31px,4vw,46px)}.back-btn{background:transparent;border:1px solid #cfd7e8;color:#315ee8;border-radius:999px;font-size:0}.back-btn:after{content:'Back to workspace';font-size:13px}.upload-section{max-width:1120px;margin:0 auto 32px;background:#fffefa;border:1px dashed #b8c7e8;border-radius:14px;padding:18px}.upload-btn{background:#315ee8;border-radius:999px}.upload-btn:hover:not(:disabled){background:#2547b6}.notes-grid{max-width:1120px;margin:auto;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:18px}.note-card{border:1px solid #e1e4dc;box-shadow:none;border-radius:14px}.note-card:hover{box-shadow:0 13px 28px rgba(32,47,78,.09)}.note-file-icon{background:#eef2ff;font-size:0}.note-file-icon:after{content:'f(x)';font:600 28px Georgia,serif;color:#315ee8}.note-name{color:#172033}.delete-note-btn{font-size:0;border:1px solid #f1d1d5;border-radius:7px;padding:6px 9px;align-self:flex-start}.delete-note-btn:after{content:'Delete';font-size:11px;font-weight:600}.empty-state{margin:80px auto;max-width:580px;padding:55px;background:#fffefa;border:1px dashed #d5dcd2;border-radius:16px}.empty-state .empty-icon{font-size:0}.empty-state .empty-icon:after{content:'Σ';font:600 40px Georgia,serif;color:#315ee8}
+.file-name{font-size:0}.file-name:after{content:'File selected';font-size:12px;font-style:normal}

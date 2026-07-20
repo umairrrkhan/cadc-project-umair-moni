@@ -4,6 +4,7 @@ import '../css/VisionMode.css';
 import {visionService} from '../service/visionService';
 
 const VisionMode = () => {
+  const penColors = ['#111827', '#dc2626'];
   const [uploadedImage, setUploadedImage] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
   const [replyText, setReplyText] = useState(null);
@@ -345,6 +346,11 @@ const VisionMode = () => {
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33" />
                 </svg>
               </label>
+              <div className='color-swatches' aria-label='Pen colors'>
+                {penColors.map((penColor) => (
+                  <button key={penColor} type='button' className={`color-swatch ${color === penColor ? 'active' : ''}`} style={{ backgroundColor: penColor }} onClick={() => setColor(penColor)} aria-label={`Use ${penColor} pen`} />
+                ))}
+              </div>
               <input
                 type="color"
                 value={color}

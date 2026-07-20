@@ -77,8 +77,8 @@
 
 .header-btn.active {
   background: #eef2ff;
-  border-color: #818cf8;
-  color: #4338ca;
+  border-color: #9eb7ff;
+  color: #2547b6;
 }
 
 .card-body {
@@ -177,7 +177,7 @@
 }
 
 .upload-overlay:hover {
-  border-color: #818cf8;
+  border-color: #9eb7ff;
   background: rgba(238, 242, 255, 0.95);
 }
 
@@ -238,6 +238,12 @@
   border-radius: 4px;
 }
 
+.color-swatches { display:flex; align-items:center; gap:6px; margin-left:4px; }
+.color-picker { display:none; }
+.color-swatch { width:18px; height:18px; padding:0; border:2px solid transparent; border-radius:50%; box-shadow:0 0 0 1px rgba(23,32,51,.16); cursor:pointer; transition:transform .15s, box-shadow .15s; }
+.color-swatch:hover { transform:scale(1.15); }.color-swatch.active { border-color:#fff; box-shadow:0 0 0 2px #315ee8; transform:scale(1.08); }
+@media (max-width:560px) { .color-swatches { order:3; width:100%; margin:4px 0 0; } }
+
 .brush-size-group {
   flex: 1;
   min-width: 100px;
@@ -260,7 +266,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #315ee8;
   border: 2px solid #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   cursor: pointer;
@@ -270,7 +276,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #315ee8;
   border: 2px solid #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   cursor: pointer;
@@ -336,18 +342,18 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: #4f46e5;
+  background: #315ee8;
   color: #fff;
   cursor: pointer;
   letter-spacing: 0.01em;
 }
 
 .solve-btn:hover {
-  background: #4338ca;
+  background: #2547b6;
 }
 
 .solve-btn:active {
-  background: #3730a3;
+  background: #2547b6;
 }
 
 @media (max-width: 768px) {

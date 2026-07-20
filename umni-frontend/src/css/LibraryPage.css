@@ -35,7 +35,7 @@
   padding: 0.6rem 1.2rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #4f46e5;
+  color: #315ee8;
   background-color: #eef2ff;
   border: 1px solid #e0e7ff;
   border-radius: 10px;
@@ -44,9 +44,9 @@
 }
 
 .library-header button:hover {
-  background-color: #4f46e5;
+  background-color: #315ee8;
   color: #ffffff;
-  border-color: #4f46e5;
+  border-color: #315ee8;
   transform: translateX(-2px);
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
 }
@@ -199,3 +199,5 @@
     gap: 1rem;
   }
 }
+
+.library-page{max-width:none;margin:0;min-height:100vh;padding:56px clamp(22px,6vw,82px);background:#f8f7f2}.library-header{max-width:1120px;width:100%;margin:0 auto 10px;border-color:#dfe2da}.library-header h2{font:600 clamp(31px,4vw,46px)/1.05 Georgia,serif;color:#172033;font-size:0}.library-header h2:after{content:'Solved work';font-size:clamp(31px,4vw,46px)}.library-header button{background:transparent;border-color:#cfd7e8;color:#315ee8;border-radius:999px}.library-header button{font-size:0}.library-header button:after{content:'Back to workspace';font-size:13px}.image-grid{max-width:1120px;margin:22px auto;gap:18px}.image-card{border-color:#e1e4dc;border-radius:14px;box-shadow:none}.image-card:hover{border-color:#b9c8f1;box-shadow:0 13px 28px rgba(32,47,78,.09)}.image-info{padding:13px 15px}.delete-btn{width:auto;height:auto;padding:7px 10px;font-size:0;border-radius:7px}.delete-btn:after{content:'Delete';font-size:11px;font-weight:600}.empty-library{background:#fffefa;border-color:#d5dcd2;box-shadow:0 12px 25px rgba(23,32,51,.04)}.empty-library .empty-icon{font-size:0;width:48px;height:48px;border-radius:12px;background:#e8eeff}.empty-library .empty-icon:after{content:'x2';font:600 20px Georgia,serif;color:#315ee8;line-height:48px}

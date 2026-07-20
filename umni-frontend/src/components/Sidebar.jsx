@@ -9,6 +9,7 @@ const Sidebar = ({ onNewChat }) => {
     const [sessions, setSessions] = useState([]);
     const location = useLocation();
     const [dropdownOpen , setDropdownOpen] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const navigate = useNavigate();
 
     const loadSessions = async () => {
@@ -50,11 +51,11 @@ const Sidebar = ({ onNewChat }) => {
     };
 
     const handleDeleteChat = async (chatId) => {
-        if(!window.confirm('delete this conversation')) return ;
         try{
             await chatService.deleteSession(chatId);
             setSessions(prev => prev.filter(s => s.id !== chatId));
             setDropdownOpen(null);
+            setDeleteTarget(null);
 
             if(location.pathname === `/home/${chatId}`){
                 navigate('/home');
@@ -70,6 +71,7 @@ const Sidebar = ({ onNewChat }) => {
     }, [location.pathname]);
 
     return (
+        <>
         <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
             <div className='sidebar-header'>
                 <img src='/logo.svg' alt='Logo' className='logo'/>
@@ -110,9 +112,7 @@ const Sidebar = ({ onNewChat }) => {
                                             className="conv-menu-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                setDropdownOpen(
-                                                    dropdownOpen === conv.id ? null : conv.id 
-                                                );
+                                                setDeleteTarget(conv.id);
                                             }}
                                             >
                                                 :
@@ -158,6 +158,20 @@ const Sidebar = ({ onNewChat }) => {
                 </>
             )}
         </div>
+        {deleteTarget && (
+            <div className='delete-modal-backdrop' role='presentation' onClick={() => setDeleteTarget(null)}>
+                <div className='delete-modal' role='dialog' aria-modal='true' aria-labelledby='delete-title' onClick={(e) => e.stopPropagation()}>
+                    <span className='delete-modal-mark'>&times;</span>
+                    <h2 id='delete-title'>Delete conversation?</h2>
+                    <p>This will permanently remove this chat and its messages.</p>
+                    <div className='delete-modal-actions'>
+                        <button className='delete-cancel' onClick={() => setDeleteTarget(null)}>Cancel</button>
+                        <button className='delete-confirm' onClick={() => handleDeleteChat(deleteTarget)}>Delete chat</button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 

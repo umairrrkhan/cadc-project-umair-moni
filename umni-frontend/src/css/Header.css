@@ -71,3 +71,10 @@
 }
 
 .header-icon-btn:hover { background: #f3f4f6; color: #111; }
+
+.app-header { background:#fffefa; border-color:#e3e5dc; height:64px; }.app-header-logo-icon { color:#315ee8; }.app-header-logo-text { color:#172033; }.app-header-modes { background:#edf0f6; border-radius:999px; padding:4px; }.mode-tab { border-radius:999px; color:#71809b; }.mode-tab.active { color:#172033; box-shadow:0 2px 6px rgba(23,32,51,.1); }.header-icon-btn:hover { background:#e7edff; color:#315ee8; }
+
+.app-header-left { gap:10px; }.app-header-logo-icon { display:grid; place-items:center; width:25px; height:25px; background:#172033; color:#fff; border-radius:7px; font-family:Georgia,serif; font-size:0; }.app-header-logo-icon:after { content:'Σ'; font-size:16px; }.app-header-logo-text { letter-spacing:-.04em; }.app-header-modes { border:1px solid #dde2eb; }.mode-tab { padding:7px 17px; letter-spacing:.01em; }.header-icon-btn { font-size:0; border:1px solid #d9dfeb; padding:8px 12px; }.header-icon-btn:after { content:'New problem'; font-size:12px; font-weight:600; color:#315ee8; }
+.mode-tab{font-size:0}.mode-tab:first-child:after{content:'Text solver';font-size:13px}.mode-tab:nth-child(2):after{content:'Canvas solver';font-size:13px}
+.header-icon-btn{display:none}
+@media(max-width:620px){.app-header{padding:0 12px}.app-header-left .app-header-logo-text{display:none}.mode-tab{padding:7px 10px;font-size:12px}.header-icon-btn:after{content:'New';}}

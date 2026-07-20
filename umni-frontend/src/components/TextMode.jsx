@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/TextMode.css';
+import 'katex/dist/katex.min.css';
 import { chatService } from '../service/chatService';
+import katex from 'katex';
 
 const TextMode = ({ chatId, onSessionUpdate }) => {
   const [input, setInput] = useState('');
@@ -265,11 +267,12 @@ const renderFormattedMessage = (content) => {
     return subParts.map((subPart, subIndex) => {
       if (subPart.startsWith('$$') && subPart.endsWith('$$')) {
         const math = subPart.slice(2, -2).trim();
-        return (
-          <div key={`${index}-${subIndex}`} className="math-block">
-            {math}
-          </div>
-        );
+        try {
+          const html = katex.renderToString(math, { displayMode: true, throwOnError: false });
+          return <div key={`${index}-${subIndex}`} className="math-block" dangerouslySetInnerHTML={{ __html: html }} />;
+        } catch {
+          return <div key={`${index}-${subIndex}`} className="math-block">{math}</div>;
+        }
       }
 
       const inlineParts = subPart.split(/(\$[^\$]*?\$|\\\(.*?\\\))/g);
@@ -277,11 +280,12 @@ const renderFormattedMessage = (content) => {
         if ((inlinePart.startsWith('$') && inlinePart.endsWith('$')) || 
             (inlinePart.startsWith('\\(') && inlinePart.endsWith('\\)'))) {
           const math = inlinePart.startsWith('$') ? inlinePart.slice(1, -1).trim() : inlinePart.slice(2, -2).trim();
-          return (
-            <span key={`${index}-${subIndex}-${inlineIndex}`} className="math-inline">
-              {math}
-            </span>
-          );
+          try {
+            const html = katex.renderToString(math, { displayMode: false, throwOnError: false });
+            return <span key={`${index}-${subIndex}-${inlineIndex}`} className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />;
+          } catch {
+            return <span key={`${index}-${subIndex}-${inlineIndex}`} className="math-inline">{math}</span>;
+          }
         }
 
         return formatTextWithMarkdown(inlinePart, `${index}-${subIndex}-${inlineIndex}`);

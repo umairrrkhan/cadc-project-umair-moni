@@ -35,14 +35,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-page">
-      {/* Left brand panel */}
+    <>
+      <header className="landing-header">
+        <a href="/" className="landing-logo"><span>◆</span> UmNi</a>
+        <nav>
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+          <a href="/create-account">Create account</a>
+        </nav>
+      </header>
+      <div className="login-page" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      
       <div className="login-brand">
-        <Link to="/" className="login-logo">
-          <span className="login-logo-icon">◆</span>
-          <span className="login-logo-text">UmNi</span>
-        </Link>
-        <div className="login-brand-body">
+        <div className="login-brand-body" style={{ marginTop: 0 }}>
           <h2>The AI math assistant<br />that reads your handwriting.</h2>
           <p>Draw. Ask. Solve — in seconds.</p>
         </div>
@@ -91,6 +96,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
