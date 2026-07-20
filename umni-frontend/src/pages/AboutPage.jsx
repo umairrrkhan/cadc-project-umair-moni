@@ -34,7 +34,7 @@ const AboutPage = () => {
       {/* ── TEAM & SUMMARY SECTION ── */}
       <section className="about-details">
         {/* Name pill containing collaborators */}
-        <div className="team-pill">
+        <div className="team-pill mt-7">
           <span className="team-member">Karnika</span>
           <span className="team-member">Umair</span>
           <span className="team-member">Moni</span>

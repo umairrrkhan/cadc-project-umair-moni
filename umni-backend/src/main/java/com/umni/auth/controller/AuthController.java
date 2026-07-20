@@ -34,7 +34,7 @@ public class AuthController {
     private BCryptPasswordEncoder encoder;
 	
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@RequestBody SignupRequest request){
+	public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request){
 		String email = request.getEmail();
 		String password = request.getPassword();
 		

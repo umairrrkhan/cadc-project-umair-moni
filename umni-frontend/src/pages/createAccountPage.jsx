@@ -13,10 +13,11 @@ const CreateAccountPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email.includes('@')) {
-      setError('Enter a valid email address');
-      return;
-    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+    setError('Please enter a valid email address (eg = user@gmail.com)');
+    return;
+}
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
