@@ -131,64 +131,57 @@ If the `sendMessage` endpoint times out (AI takes too long):
 ### Backend Frameworks & Libraries
 
 #### Spring Ecosystem
-| Library | Version | Purpose |
-|---------|---------|---------|
-| Spring Boot 3 (Web, WebFlux) | 3.1.5 | REST APIs, reactive HTTP clients |
-| Spring Cloud Gateway | 2025.0.3 | API routing, load balancing |
-| Spring Cloud Netflix Eureka | 2025.0.3 | Service discovery |
-| Spring Cloud Circuit Breaker (Resilience4j) | 2025.0.3 | Fault tolerance, fallback handling |
-| Spring Cloud LoadBalancer | 2025.0.3 | Client-side load balancing |
-| Spring Security 6 | — | Authentication & authorization |
-| Spring Data MongoDB | 3.5.3 | MongoDB repository support |
-| Spring Data JPA / Hibernate | — | MySQL ORM (Note Service) |
-| Spring Boot Actuator | — | Health checks, metrics, circuit breaker monitoring |
-| Spring Boot Validation | — | Request validation (JSR-380) |
-| Spring WebClient | — | Reactive HTTP calls (AI APIs) |
+| Library | Purpose |
+|---------|---------|
+| Spring Boot 3 (Web, WebFlux) | REST APIs, reactive HTTP clients |
+| Spring Cloud Gateway | API routing, load balancing |
+| Spring Cloud Netflix Eureka | Service discovery |
+| Spring Cloud Circuit Breaker (Resilience4j) | Fault tolerance, fallback handling |
+| Spring Security 6 | Authentication & authorization |
+| Spring Data MongoDB | MongoDB repository support |
+| Spring Data JPA / Hibernate | MySQL ORM (Note Service) |
+| Spring WebClient | Reactive HTTP calls (AI APIs) |
 
 #### Security
-| Library | Version | Purpose |
-|---------|---------|---------|
-| JJWT API | 0.12.5 | JWT token generation and parsing |
-| JJWT Impl | 0.12.5 | JWT implementation |
-| JJWT Jackson | 0.12.5 | JSON serialization for JWT |
-| BCrypt | — | Password hashing |
+| Library | Purpose |
+|---------|---------|
+| JJWT 0.12.5 (API, Impl, Jackson) | JWT token generation and parsing |
+| BCrypt | Password hashing |
 
 #### Database Drivers
-| Library | Version | Purpose |
-|---------|---------|---------|
-| MongoDB Driver | 4.9.1 | MongoDB connectivity |
-| MySQL Connector J | — | MySQL database connectivity |
+| Library | Purpose |
+|---------|---------|
+| MongoDB Driver | MongoDB connectivity |
+| MySQL Connector J | MySQL database connectivity |
 
 #### Cloud & Storage
-| Library | Version | Purpose |
-|---------|---------|---------|
-| AWS SDK S3 | 2.21.0 / 2.25.60 | Amazon S3 file storage |
-| Imgscalr | 4.2 | Image scaling utilities |
+| Library | Purpose |
+|---------|---------|
+| AWS SDK S3 v2 | Amazon S3 file storage |
 
 #### AI / ML Integration
 | Provider | Endpoint | Model | Purpose |
 |----------|----------|-------|---------|
 | DeepSeek | /v1/chat/completions | deepseek-v4-flash | Conversational math reasoning |
 | OpenAI | /v1/images/edits | gpt-image-1-mini | Vision-based problem solving (image generation from canvas drawings) |
-| Google Gemini | /v1beta/models/{model}:generateContent | gemini-2.5-flash-image | Legacy vision (replaced by OpenAI) |
 
 ### Frontend Libraries
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| React | 18.3.1 | UI framework |
-| React Router | 7.16.0 | Client-side routing |
-| Axios | 1.17.0 | HTTP requests with interceptor-based auth |
-| KaTeX | latest | LaTeX mathematical expression rendering |
-| Framer Motion | 12.40.0 | Animation library |
-| HTML5 Canvas API | — | Drawing board for vision mode |
+| Library | Purpose |
+|---------|---------|
+| React 18 | UI framework |
+| React Router 7 | Client-side routing |
+| Axios | HTTP requests with interceptor-based auth |
+| KaTeX | LaTeX mathematical expression rendering |
+| Framer Motion | Animation library |
+| HTML5 Canvas API | Drawing board for vision mode |
 
 ### Databases
 
 | Database | Hosting | Usage |
 |----------|---------|-------|
-| MongoDB Atlas | Cloud (MongoDB) | Chat sessions, messages, vision records |
-| MySQL | Railway (cloud) | Note service file metadata |
+| MongoDB Atlas | Cloud | Chat sessions, messages, vision records |
+| MySQL | Cloud (Railway) | Note service file metadata |
 
 ### Cloud Infrastructure
 
@@ -200,13 +193,12 @@ If the `sendMessage` endpoint times out (AI takes too long):
 
 ### Tools & Build
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Maven | — | Java build and dependency management |
-| Git | — | Version control |
-| Create React App | 5.0.1 | React project scaffolding |
-| npm | — | JavaScript package management |
-| IntelliJ IDEA / VS Code | — | Development environments |
+| Tool | Purpose |
+|------|---------|
+| Maven | Java build and dependency management |
+| Git | Version control |
+| Create React App | React project scaffolding |
+| npm | JavaScript package management |
 
 ---
 
@@ -292,5 +284,5 @@ If the `sendMessage` endpoint times out (AI takes too long):
 ### Environment Variables
 ```
 MONGODB_URI, JWT_SECRET, DEEPSEEK_API_KEY, OPENAI_API_KEY,
-AWS_ACCESS_KEY, AWS_SECRET_KEY, GEMINI_API_KEY (legacy)
+AWS_ACCESS_KEY, AWS_SECRET_KEY
 ```
