@@ -46,7 +46,7 @@ public class AuthController {
                     .body(Map.of("error", "email already exists"));
         }
         
-        if(password.length()<5) {
+        if(password.length()<6) {
         	return ResponseEntity.badRequest().body(Map.of("error","password must be at least 6 charachter"));
         }
         
