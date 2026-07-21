@@ -45,7 +45,10 @@ const CreateAccountPage = () => {
   return (
     <>
       <header className="landing-header">
-        <a href="/" className="landing-logo"><span>◆</span> UmNi</a>
+        <a href="/" className="landing-logo">
+          <img src="/favicon.svg" alt="UmNi Logo" style={{ width: '26px', height: '26px', borderRadius: '6px' }} />
+          UmNi
+        </a>
         <nav>
           <a href="/">Home</a>
           <a href="/about">About</a>
