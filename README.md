@@ -1,6 +1,6 @@
 # AI-Powered Multimodal Math Problem Solver
 
-A cloud-native, microservice-based platform that solves mathematical problems through two distinct interaction modes — text-based conversational chat and a vision-powered drawing interface. The system integrates multiple AI models, supports real-time message processing, and provides persistent history with LaTeX-rendered mathematical output.
+Ask UmNi  , A cloud-native, microservice-based platform that solves mathematical problems through two distinct interaction modes — text-based conversational chat and a vision-powered drawing interface. The system integrates multiple AI models, supports real-time message processing, and provides persistent history with LaTeX-rendered mathematical output.
 
 ---
 
