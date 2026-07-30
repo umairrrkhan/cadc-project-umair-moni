@@ -60,7 +60,7 @@ public class VisionService {
         builder.part("prompt", DEFAULT_PROMPT);
         builder.part("quality", quality);
         builder.part("size", size);
-        builder.part("output_format", "webp");
+        builder.part("output_format", "png");
         builder.part("n", 1);
 
         return webClient.post()

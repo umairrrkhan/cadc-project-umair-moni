@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface ChatSessionRepository extends MongoRepository<ChatSession, String >  {
 	 List<ChatSession> findByUserIdOrderByUpdatedAtDesc(String userId);
+	 void deleteByUserId(String userId);
 
 }

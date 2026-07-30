@@ -53,6 +53,17 @@ public class S3StorageService {
 	public void deleteImage(String key) {
         s3Client.deleteObject(builder -> builder.bucket(bucketName).key(key));
     }
+
+	public void deleteImageByUrl(String imageUrl) {
+		if (imageUrl == null || imageUrl.isBlank()) {
+			return;
+		}
+		String prefix = String.format("https://%s.s3.amazonaws.com/", bucketName);
+		if (!imageUrl.startsWith(prefix)) {
+			throw new IllegalArgumentException("Image URL does not belong to the configured bucket");
+		}
+		deleteImage(imageUrl.substring(prefix.length()));
+	}
 	
 	
 

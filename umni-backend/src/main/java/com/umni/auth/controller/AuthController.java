@@ -18,6 +18,11 @@ import jakarta.validation.Valid;
 import com.umni.auth.dto.SignupRequest;
 
 import com.umni.auth.dto.LoginRequest;
+import com.umni.auth.dto.DeleteAccountRequest;
+import com.umni.auth.service.AccountDeletionService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpHeaders;
 
 
 @RestController
@@ -32,6 +37,9 @@ public class AuthController {
 	
 	@Autowired
     private BCryptPasswordEncoder encoder;
+
+	@Autowired
+	private AccountDeletionService accountDeletionService;
 	
 	@PostMapping("/signup")
 	public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request){
@@ -87,6 +95,30 @@ public class AuthController {
 		return ResponseEntity.ok(Map.of("token", token, "user", Map.of("email", request.getEmail())));
 	
 		
+	}
+
+	@DeleteMapping("/account")
+	public ResponseEntity<?> deleteAccount(
+			@RequestBody @Valid DeleteAccountRequest request,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !(authentication.getDetails() instanceof Map)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("error", "Authentication required"));
+		}
+
+		Map<?, ?> details = (Map<?, ?>) authentication.getDetails();
+		String userId = (String) details.get("userId");
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (!encoder.matches(request.getPassword(), user.getPassword())) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("error", "Current password is incorrect"));
+		}
+
+		accountDeletionService.deleteAccount(userId, authorizationHeader);
+		return ResponseEntity.ok(Map.of("success", true));
 	}
 	
 

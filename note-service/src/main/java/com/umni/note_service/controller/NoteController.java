@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import org.springframework.util.StringUtils;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -24,10 +26,13 @@ public class NoteController {
 	
 	private final NoteRepository noteRepository;
 	private final S3StorageService  s3Service;
+	private final FileValidationService fileValidationService;
 	
-	public NoteController(NoteRepository noteRepository, S3StorageService s3Service) {
+	public NoteController(NoteRepository noteRepository, S3StorageService s3Service,
+			FileValidationService fileValidationService) {
         this.noteRepository = noteRepository;
         this.s3Service = s3Service;
+        this.fileValidationService = fileValidationService;
     }
 	
 	private String getCurrentUserId() {
@@ -55,11 +60,14 @@ public class NoteController {
 			
 			String userId = getCurrentUserId(); 
 			
-			String originalName = file.getOriginalFilename();
-            String contentType = file.getContentType();
+			FileValidationService.ValidatedFile validated = fileValidationService.validate(file);
+			String originalName = validated.fileName();
+            String contentType = validated.contentType();
             byte[] bytes = file.getBytes();
             
-            String key = "notes/" + userId + "/" + System.currentTimeMillis() + "_" + originalName;
+            String extension = StringUtils.getFilenameExtension(originalName);
+            String key = "notes/" + userId + "/" + UUID.randomUUID()
+                    + (extension == null ? "" : "." + extension.toLowerCase());
             String fileUrl = s3Service.uploadFile(bytes, key, contentType);
 
             Note note = new Note();
@@ -74,9 +82,11 @@ public class NoteController {
             
             return ResponseEntity.ok(note);
 
+		}catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
 		}catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", "Upload failed"));
 	}
 		
 	}
@@ -109,53 +119,18 @@ public class NoteController {
 
 
 }
-		@PostMapping("/internal/upload")
-	    public ResponseEntity<?> internalUploadNote(
-	            @RequestParam("userId") String userId,
-	            @RequestParam("file") MultipartFile file) {
-			
-			try {
-	                String originalName = file.getOriginalFilename();
-	                String contentType = file.getContentType();
-	                byte[] bytes = file.getBytes();
 
-	                String key = "notes/" + userId + "/" + System.currentTimeMillis() + "_" + originalName;
-	                String fileUrl = s3Service.uploadFile(bytes, key, contentType);
+		@DeleteMapping("/account")
+		public ResponseEntity<?> deleteCurrentUserNotes() {
+			String userId = getCurrentUserId();
+			List<Note> notes = noteRepository.findByUserIdOrderByUploadedAtDesc(userId);
 
-	                Note note = new Note();
-	                note.setUserId(userId);
-	                note.setFileName(originalName);
-	                note.setFileType(contentType);
-	                note.setS3Url(fileUrl);
-	                note.setS3Key(key);
-	                note.setUploadedAt(Instant.now());
+			for (Note note : notes) {
+				s3Service.deleteFile(note.getS3Key());
+			}
+			noteRepository.deleteAll(notes);
 
-	                noteRepository.save(note);
-	                return ResponseEntity.ok(note);
-	            } catch (Exception e) {
-	                return ResponseEntity.status(500).body("Internal upload failed: " + e.getMessage());
-	            }
-}
-		
-		@GetMapping("/internal/user/{userId}")
-	    public ResponseEntity<List<Note>> internalGetUserNotes(@PathVariable String userId) {
-	        return ResponseEntity.ok(noteRepository.findByUserIdOrderByUploadedAtDesc(userId));
-	    }
-		
-		@DeleteMapping("/internal/{noteId}")
-	    public ResponseEntity<?> internalDeleteNote(
-	            @PathVariable String noteId,
-	            @RequestParam("userId") String userId)  {
-	        Note note = noteRepository.findById(noteId)
-	                .orElseThrow(() -> new RuntimeException("Note not found"));
-
-	        if (!note.getUserId().equals(userId)) {
-	            return ResponseEntity.status(403).body("Unauthorized");
-	        }
-
-	        s3Service.deleteFile(note.getS3Key());
-	        noteRepository.deleteById(noteId);
-	        return ResponseEntity.ok().build();
-	    }
+			return ResponseEntity.ok(Map.of("deleted", notes.size()));
+		}
 
 }

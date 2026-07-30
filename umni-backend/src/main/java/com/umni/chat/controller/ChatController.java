@@ -89,9 +89,19 @@ public class ChatController {
 	public Mono<Map<String , String >> sendMessage(@PathVariable String chatId ,
 			@RequestBody Map<String , String > payload){
 		String userMessage = payload.get("message");
+		if (userMessage == null || userMessage.trim().isEmpty()) {
+			throw new IllegalArgumentException("message is required");
+		}
 		Instant now =  Instant.now();
 		
 		String userId= getCurrentUserId();
+
+		ChatSession session = chatSessionRepository.findById(chatId)
+				.orElseThrow(() -> new RuntimeException("session not found"));
+
+		if(!session.getUserId().equals(userId)) {
+			throw new RuntimeException("unauthorized access to this session");
+		}
 		
 		Message userMsg = new Message();
 		userMsg.setChatId(chatId);
@@ -101,12 +111,6 @@ public class ChatController {
 		userMsg.setUserId(userId); 
 		messageRepository.save(userMsg);
 		
-		
-		 ChatSession session = chatSessionRepository.findById(chatId).orElseThrow(() -> new RuntimeException("session not found "));
-		 
-		 if(!session.getUserId().equals(userId)) {
-			 throw new RuntimeException("unauthorized access to this session");
-		 }
 		 session.setUpdatedAt(now);
 		 
 		 // Set title from first user message

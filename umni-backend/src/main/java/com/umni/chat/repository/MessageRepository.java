@@ -28,6 +28,8 @@ public interface MessageRepository extends MongoRepository<Message , String> {
 	
 		
 	void deleteByChatId(String chatId);
+
+	void deleteByUserId(String userId);
 	
 	@Query("{'chatId':?0")
 	void softDeleteByChatId(String chatId);

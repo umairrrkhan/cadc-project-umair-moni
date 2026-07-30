@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../service/api';
 import '../css/LoginPage.css';
 
 const LoginPage = () => {
@@ -24,11 +24,11 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setTimeout(() => (window.location.href = '/home'), 1000);
-    } catch {
-      setError('Invalid email or password. Please try again.');
+    } catch (error) {
+      setError(error.message || 'Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
     }

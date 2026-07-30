@@ -30,6 +30,11 @@ useEffect(() => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Files must be 10 MB or smaller.');
+                e.target.value = '';
+                return;
+            }
             // Validate file type (images, pdf, txt, doc, docx)
             const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             if (!validTypes.includes(file.type)) {

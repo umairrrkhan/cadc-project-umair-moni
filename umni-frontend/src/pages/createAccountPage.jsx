@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../service/api";
 import "../css/LoginPage.css";
 
 const CreateAccountPage = () => {
@@ -25,16 +25,14 @@ const CreateAccountPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/signup", { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      const response = await api.post("/auth/signup", { email, password });
       localStorage.setItem("token", response.data.token);
       setMessage("Account created successfully!");
       setError("");
       setTimeout(() => window.location.href = "/home", 2000);
     } catch (error) {
       console.error("Full signup error:", error);
-      const errMsg = error.response?.data?.error || error.message || "Error creating account. Please try again.";
+      const errMsg = error.message || "Error creating account. Please try again.";
       setError(errMsg);
       setMessage("");
     } finally {

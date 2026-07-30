@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface VisionRepository extends MongoRepository<Vision , String> {
 	List<Vision > findByUserIdOrderByCreatedAtDesc(String userId);
 	void deleteByUserIdAndId(String userId , String id);
+	void deleteByUserId(String userId);
 
 }
