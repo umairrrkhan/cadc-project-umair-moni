@@ -109,7 +109,7 @@ All client traffic enters through the API Gateway at `http://localhost:8080`.
 | Route group | Purpose |
 |---|---|
 | `/api/auth/**` | Registration, login, profile, and account deletion |
-| `/api/chats/**` | Chat sessions and messages |
+| `/api/chat/**` | Chat sessions and messages |
 | `/api/vision/**` | Vision solving and saved-image library |
 | `/api/notes/**` | Note upload, listing, download, and deletion |
 
@@ -138,11 +138,13 @@ cdac-project/
 
 ### Configuration
 
-Copy the backend template and provide your own values as environment variables:
+For Docker Compose, copy the root environment template and replace every placeholder:
 
 ```powershell
 Copy-Item .env.example .env
 ```
+
+Docker Compose reads this root `.env` file automatically. Direct Maven startup does not. When running the Spring services directly, export the same variables in the terminal or provide them through the ignored `application-local.properties` files used by Core Service and Note Service.
 
 For the React client:
 
@@ -214,7 +216,7 @@ The automated suite does not yet cover end-to-end authentication, chat and visio
 
 ## Deployment roadmap
 
-The planned deployment target is **AWS EC2**. The React production build will be served through Nginx, which will forward API requests to the Spring Cloud Gateway. The Gateway will remain the single public entry point for the Core and Note microservices registered through Eureka.
+The repository is prepared for deployment on a single **AWS EC2** instance with multi-stage Docker images and Docker Compose. The React production build is served through Nginx, which forwards API requests to the Spring Cloud Gateway. The Gateway remains the single entry point for the Core and Note microservices registered through Eureka.
 
 ~~~text
 Browser
@@ -228,11 +230,13 @@ AWS EC2 / Nginx
                               +-- Eureka service discovery
 ~~~
 
-Runtime credentials and connection strings will be supplied through EC2 environment configuration rather than committed files. MongoDB Atlas, the existing MySQL database, and private AWS S3 storage will remain external managed dependencies. HTTPS, process supervision, health checks, and automated deployment are part of this deployment milestone.
+Only host port 80 is published. Eureka, Gateway, Core Service, and Note Service remain private inside one Docker bridge network. Runtime credentials are supplied through the ignored root .env file, and container health checks control startup order.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete EC2 setup, security-group rules, environment configuration, deployment command, and troubleshooting steps.
 
 ## Current scope
 
-UmNi is a portfolio/capstone application demonstrating an end-to-end microservices system and real external AI integrations. Local development is working; AWS EC2 deployment is planned and should not yet be interpreted as a live production environment. The next engineering priorities are containerized startup, automated integration tests, CI/CD, observability, and the EC2 release.
+UmNi is a portfolio/capstone application demonstrating an end-to-end microservices system and real external AI integrations. Local development and the single-instance EC2 deployment package are ready; a public live URL will be added after the first EC2 release. The next engineering priorities are automated integration tests, CI/CD, HTTPS, and observability.
 
 ---
 

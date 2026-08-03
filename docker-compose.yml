@@ -1,0 +1,122 @@
+name: umni
+
+services:
+  service-registry:
+    build:
+      context: ./service-registry
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - umni-network
+    mem_limit: 384m
+    security_opt:
+      - no-new-privileges:true
+
+  core-service:
+    build:
+      context: ./umni-backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_DEFAULT_ZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: core-service
+      NOTE_SERVICE_URL: http://note-service:8083
+      MONGODB_URI: "${MONGODB_URI:?MONGODB_URI is required}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      JWT_EXPIRATION_MS: "${JWT_EXPIRATION_MS:-86400000}"
+      DEEPSEEK_API_KEY: "${DEEPSEEK_API_KEY:?DEEPSEEK_API_KEY is required}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:?OPENAI_API_KEY is required}"
+      AWS_S3_BUCKET: "${AWS_S3_BUCKET:?AWS_S3_BUCKET is required}"
+      AWS_REGION: "${AWS_REGION:-ap-south-1}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY:?AWS_ACCESS_KEY is required}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY:?AWS_SECRET_KEY is required}"
+    networks:
+      - umni-network
+    mem_limit: 1g
+    security_opt:
+      - no-new-privileges:true
+
+  note-service:
+    build:
+      context: ./note-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_DEFAULT_ZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: note-service
+      MYSQL_URL: "${MYSQL_URL:?MYSQL_URL is required}"
+      MYSQL_USERNAME: "${MYSQL_USERNAME:?MYSQL_USERNAME is required}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      JWT_EXPIRATION_MS: "${JWT_EXPIRATION_MS:-86400000}"
+      AWS_S3_BUCKET: "${AWS_S3_BUCKET:?AWS_S3_BUCKET is required}"
+      AWS_REGION: "${AWS_REGION:-ap-south-1}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY:?AWS_ACCESS_KEY is required}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY:?AWS_SECRET_KEY is required}"
+      JPA_SHOW_SQL: "${JPA_SHOW_SQL:-false}"
+      JPA_FORMAT_SQL: "${JPA_FORMAT_SQL:-false}"
+    networks:
+      - umni-network
+    mem_limit: 768m
+    security_opt:
+      - no-new-privileges:true
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      core-service:
+        condition: service_healthy
+      note-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_DEFAULT_ZONE: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:?CORS_ALLOWED_ORIGINS is required}"
+    networks:
+      - umni-network
+    mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+
+  frontend:
+    build:
+      context: ./umni-frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_BASE_URL: /api
+    restart: unless-stopped
+    init: true
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "80:8080"
+    networks:
+      - umni-network
+    mem_limit: 128m
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  umni-network:
+    driver: bridge

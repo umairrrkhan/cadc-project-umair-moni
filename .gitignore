@@ -113,6 +113,8 @@ local.properties
 # AWS Credentials (if you accidentally save them locally)
 .aws/
 aws-keys.txt
+*.pem
+*.ppk
 
 # Environment variables
 .env
