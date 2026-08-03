@@ -16,6 +16,14 @@ UmNi is a full-stack learning platform that brings text-based AI assistance, vis
 
 ## Product showcase
 
+### AI chat
+
+The conversational workspace keeps previous sessions in the sidebar and renders structured, step-by-step mathematical answers directly in the chat.
+
+![UmNi AI chat workspace showing a mathematical conversation and generated answer](docs/images/chat.png)
+
+### Vision workspace
+
 The Vision workspace lets a user draw a problem, send it to the AI, and receive a generated step-by-step solution while keeping both the original and solved images in their library.
 
 ![UmNi Vision workspace showing a handwritten equation and its generated solution](docs/images/vision-showcase.jpeg)
@@ -170,18 +178,61 @@ npm start
 
 Open `http://localhost:3000` in a browser. The Eureka dashboard is available at `http://localhost:8761`.
 
-## Verification
+## Testing and quality assurance
 
-The repository includes Spring context tests and focused file-validation tests. A production frontend build can be checked with:
+UmNi includes automated checks across the frontend and supporting microservices. The current suite focuses on application startup, a critical file-upload security boundary, and the public React entry point.
+
+| Test area | Module | What it verifies |
+|---|---|---|
+| Application context | `service-registry` | Eureka server configuration and Spring context load successfully |
+| Application context | `api-gateway` | Gateway routes, filters, discovery, and Spring configuration can initialize |
+| Application context | `note-service` | JPA, security, storage, and service configuration can initialize with test properties |
+| File validation | `note-service` | Valid PNG content is accepted and normalized to the correct media type |
+| File validation | `note-service` | A file with a spoofed PDF extension but invalid content is rejected |
+| UI smoke test | `umni-frontend` | The public UmNi landing page renders its primary heading |
+| Production build | `umni-frontend` | React assets compile and bundle successfully for production |
+
+Run the backend test suites from the repository root:
+
+```powershell
+mvn -f service-registry/pom.xml test
+mvn -f api-gateway/pom.xml test
+mvn -f note-service/pom.xml test
+```
+
+Run the frontend smoke test and production build:
 
 ```powershell
 cd umni-frontend
+npm test -- --watchAll=false
 npm run build
 ```
 
+### Current coverage boundaries
+
+The automated suite does not yet cover end-to-end authentication, chat and vision persistence, gateway-to-service integration, or live DeepSeek, OpenAI, S3, MongoDB, and MySQL interactions. Those workflows are currently verified manually during local multi-service runs. Integration tests with mocked external providers and CI execution are planned next.
+
+## Deployment roadmap
+
+The planned deployment target is **AWS EC2**. The React production build will be served through Nginx, which will forward API requests to the Spring Cloud Gateway. The Gateway will remain the single public entry point for the Core and Note microservices registered through Eureka.
+
+~~~text
+Browser
+   |
+ HTTPS
+   v
+AWS EC2 / Nginx
+   |-- React production build
+   +-- /api -> API Gateway -> Core Service / Note Service
+                              |
+                              +-- Eureka service discovery
+~~~
+
+Runtime credentials and connection strings will be supplied through EC2 environment configuration rather than committed files. MongoDB Atlas, the existing MySQL database, and private AWS S3 storage will remain external managed dependencies. HTTPS, process supervision, health checks, and automated deployment are part of this deployment milestone.
+
 ## Current scope
 
-UmNi is a portfolio/capstone application demonstrating an end-to-end microservices system and real external AI integrations. The next engineering priorities are containerized local startup, automated integration tests, CI/CD, observability, and a managed production deployment.
+UmNi is a portfolio/capstone application demonstrating an end-to-end microservices system and real external AI integrations. Local development is working; AWS EC2 deployment is planned and should not yet be interpreted as a live production environment. The next engineering priorities are containerized startup, automated integration tests, CI/CD, observability, and the EC2 release.
 
 ---
 
