@@ -1,6 +1,6 @@
 # UmNi - AI-Powered Multimodal Math Workspace
 
-<div align=center>
+<div align=center> 
 
 **Solve mathematics through conversation, sketches, and study notes - in one secure workspace.**
 
@@ -149,7 +149,7 @@ Docker Compose reads this root `.env` file automatically. Direct Maven startup d
 For the React client:
 
 ```powershell
-Copy-Item umni-frontend/.env.example umni-frontend/.env
+Copy-Item umni-frontend/.env.example umni-frontend/.env/ok
 ```
 
 Do not commit populated `.env` files or cloud/API credentials.
