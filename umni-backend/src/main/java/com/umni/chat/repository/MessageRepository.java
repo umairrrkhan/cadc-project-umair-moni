@@ -7,11 +7,7 @@ import java.time.Instant;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
-import com.umni.chat.model.ChatSession;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message , String> {
@@ -30,9 +26,6 @@ public interface MessageRepository extends MongoRepository<Message , String> {
 	void deleteByChatId(String chatId);
 
 	void deleteByUserId(String userId);
-	
-	@Query("{'chatId':?0")
-	void softDeleteByChatId(String chatId);
 	
 	 List<Message> findByChatIdAndCreatedAtBetween(String chatId, Instant start, Instant end);
 }

@@ -19,6 +19,11 @@ public class NoteAccountClient {
     }
 
     public void deleteCurrentUserNotes(String authorizationHeader) {
+		if (authorizationHeader == null || authorizationHeader.isBlank()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+					"Authorization header is required for note cleanup");
+		}
+
         try {
             webClient.delete()
                     .uri("/api/notes/account")

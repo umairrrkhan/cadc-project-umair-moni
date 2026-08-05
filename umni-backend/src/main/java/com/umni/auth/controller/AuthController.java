@@ -21,8 +21,8 @@ import com.umni.auth.dto.LoginRequest;
 import com.umni.auth.dto.DeleteAccountRequest;
 import com.umni.auth.service.AccountDeletionService;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -100,24 +100,23 @@ public class AuthController {
 	@DeleteMapping("/account")
 	public ResponseEntity<?> deleteAccount(
 			@RequestBody @Valid DeleteAccountRequest request,
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !(authentication.getDetails() instanceof Map)) {
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+			Authentication authentication) {
+		if (authentication == null || !authentication.isAuthenticated()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Map.of("error", "Authentication required"));
 		}
 
-		Map<?, ?> details = (Map<?, ?>) authentication.getDetails();
-		String userId = (String) details.get("userId");
-		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepository.findByEmail(authentication.getName())
+				.orElseThrow(() -> new ResponseStatusException(
+						HttpStatus.UNAUTHORIZED, "Authenticated user no longer exists"));
 
 		if (!encoder.matches(request.getPassword(), user.getPassword())) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body(Map.of("error", "Current password is incorrect"));
 		}
 
-		accountDeletionService.deleteAccount(userId, authorizationHeader);
+		accountDeletionService.deleteAccount(user.getId(), authorizationHeader);
 		return ResponseEntity.ok(Map.of("success", true));
 	}
 	
