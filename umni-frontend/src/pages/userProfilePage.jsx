@@ -5,7 +5,6 @@ import '../css/ProfilePage.css';
 
 const UserProfilePage = () => {
   const [password, setPassword] = useState('');
-  const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
@@ -14,10 +13,6 @@ const UserProfilePage = () => {
     event.preventDefault();
     setError('');
 
-    if (confirmation !== 'DELETE') {
-      setError('Type DELETE exactly to confirm.');
-      return;
-    }
     if (!password) {
       setError('Enter your current password.');
       return;
@@ -49,6 +44,7 @@ const UserProfilePage = () => {
             This permanently deletes your account, conversations, messages,
             generated images, original drawings, and uploaded notes. This cannot be undone.
           </p>
+          <p>Enter your current password once to confirm permanent deletion.</p>
 
           <form onSubmit={handleDeleteAccount}>
             <label htmlFor="current-password">Current password</label>
@@ -59,15 +55,7 @@ const UserProfilePage = () => {
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
               disabled={deleting}
-            />
-
-            <label htmlFor="delete-confirmation">Type DELETE to confirm</label>
-            <input
-              id="delete-confirmation"
-              type="text"
-              value={confirmation}
-              onChange={(event) => setConfirmation(event.target.value)}
-              disabled={deleting}
+              required
             />
 
             {error && <p className="profile-error">{error}</p>}
@@ -75,7 +63,7 @@ const UserProfilePage = () => {
             <button
               className="delete-account-button"
               type="submit"
-              disabled={deleting || confirmation !== 'DELETE' || !password}
+              disabled={deleting || !password}
             >
               {deleting ? 'Deleting account...' : 'Permanently delete account'}
             </button>

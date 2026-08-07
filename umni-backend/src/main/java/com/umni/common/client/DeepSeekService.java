@@ -3,7 +3,10 @@ package com.umni.common.client;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import java.util.Locale;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
@@ -48,10 +51,9 @@ public class DeepSeekService {
     				}
     				return "sorry , i couldnt generate a response ";
     			})
-    			.onErrorResume(e->{
-    				System.out.println("deepseek api error : " + e.getMessage());
-    				return Mono.just("sorry , something went wrong ,pls try again latter");
-    			});
+			.onErrorResume(e->{
+					return handleApiError(e);
+				});
     }
     
     public Mono<String> getChatCompletionWithHistory(List<Map<String, String>> conversationHistory) {
@@ -75,10 +77,67 @@ public class DeepSeekService {
                     return "Sorry, I couldn't generate a response.";
                 })
                 .onErrorResume(e -> {
-                    System.out.println("DeepSeek API error (withHistory): " + e.getMessage());
-                    return Mono.just("Sorry, something went wrong. Please try again later.");
+                    return handleApiError(e);
                 });
     
+    }
+
+    private Mono<String> handleApiError(Throwable error) {
+        String userMessage = classifyApiError(error);
+
+        if (error instanceof WebClientResponseException responseError) {
+            System.err.println("DeepSeek API request failed with HTTP "
+                    + responseError.getStatusCode().value());
+        } else {
+            System.err.println("DeepSeek API request failed: "
+                    + error.getClass().getSimpleName());
+        }
+
+        return Mono.just(userMessage);
+    }
+
+    private String classifyApiError(Throwable error) {
+        if (error instanceof WebClientResponseException responseError) {
+            int status = responseError.getStatusCode().value();
+            String responseBody = responseError.getResponseBodyAsString().toLowerCase(Locale.ROOT);
+
+            if (status == 402 || containsAny(responseBody,
+                    "insufficient balance", "insufficient_balance",
+                    "insufficient quota", "insufficient_quota",
+                    "out of balance", "billing", "credits exhausted")) {
+                return "AI service credits are exhausted. Please recharge the API account and try again.";
+            }
+            if (status == 401) {
+                return "AI service authentication failed. Please verify the configured API key.";
+            }
+            if (status == 403) {
+                return "AI service access was denied. Please verify the account and model permissions.";
+            }
+            if (status == 429) {
+                return "AI service rate limit reached. Please wait a moment and try again.";
+            }
+            if (status == 400 || status == 422) {
+                return "AI service rejected the request. Please verify the configured model and request settings.";
+            }
+            if (status >= 500) {
+                return "AI service is temporarily unavailable. Please try again later.";
+            }
+        }
+
+        if (error instanceof WebClientRequestException) {
+            return "Could not reach the AI service. Please check the network connection and try again.";
+        }
+
+        return "The AI request failed unexpectedly. Please try again later.";
+    }
+
+    private boolean containsAny(String text, String... values) {
+        for (String value : values) {
+            if (text.contains(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

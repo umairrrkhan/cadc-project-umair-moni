@@ -112,7 +112,7 @@ public class AuthController {
 						HttpStatus.UNAUTHORIZED, "Authenticated user no longer exists"));
 
 		if (!encoder.matches(request.getPassword(), user.getPassword())) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
 					.body(Map.of("error", "Current password is incorrect"));
 		}
 

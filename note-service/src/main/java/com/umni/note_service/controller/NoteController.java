@@ -124,13 +124,22 @@ public class NoteController {
 		public ResponseEntity<?> deleteCurrentUserNotes() {
 			String userId = getCurrentUserId();
 			List<Note> notes = noteRepository.findByUserIdOrderByUploadedAtDesc(userId);
+			int storageCleanupFailures = 0;
 
 			for (Note note : notes) {
-				s3Service.deleteFile(note.getS3Key());
+				try {
+					s3Service.deleteFile(note.getS3Key());
+				} catch (Exception error) {
+					storageCleanupFailures++;
+					System.err.println("Account deletion could not remove an S3 note object: "
+							+ error.getClass().getSimpleName());
+				}
 			}
 			noteRepository.deleteAll(notes);
 
-			return ResponseEntity.ok(Map.of("deleted", notes.size()));
+			return ResponseEntity.ok(Map.of(
+					"deleted", notes.size(),
+					"storageCleanupFailures", storageCleanupFailures));
 		}
 
 }
