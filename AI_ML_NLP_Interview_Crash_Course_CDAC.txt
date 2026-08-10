@@ -1,0 +1,1524 @@
+# AI/ML Interview Crash Course for CDAC PG-DAC
+
+You already know pandas, numpy, data cleaning, and training. That's your foundation. Now let me build the **theory and concepts** around it so you can answer any interview question confidently.
+
+---
+
+## CHAPTER 1: The Big Picture — AI vs ML vs DL
+
+Interviewers **always** open with this. Nail it.
+
+```
+Artificial Intelligence (AI)
+  └── Machine Learning (ML)
+        └── Deep Learning (DL)
+```
+
+| Term | One-Line Definition | Example |
+|---|---|---|
+| **AI** | Making machines simulate human intelligence | Siri, self-driving car |
+| **ML** | A subset of AI where machines **learn from data** without being explicitly programmed | Spam filter, movie recommendations |
+| **DL** | A subset of ML using **neural networks with many layers** | Image recognition, ChatGPT |
+
+**Interview answer:**
+> "AI is the broad goal of making intelligent machines. ML is a approach under AI where we feed data and let the algorithm learn patterns. Deep Learning is a further subset of ML that uses multi-layered neural networks and works best with large amounts of unstructured data like images or text."
+
+---
+
+## CHAPTER 2: Types of Machine Learning
+
+This is the **#1 most asked** theory question.
+
+### 1. Supervised Learning
+- You have **labeled data** (input + correct output)
+- The model learns the mapping from input to output
+- Two sub-types:
+
+| Type | Output | Algorithms | Example |
+|---|---|---|---|
+| **Regression** | Continuous number | Linear Regression, Random Forest | Predict house price |
+| **Classification** | Category/Class | Logistic Regression, SVM, KNN, Decision Tree | Spam or Not Spam |
+
+### 2. Unsupervised Learning
+- **No labels** — the model finds hidden patterns on its own
+- Two sub-types:
+
+| Type | What it does | Algorithms | Example |
+|---|---|---|---|
+| **Clustering** | Groups similar data points | K-Means, DBSCAN | Customer segmentation |
+| **Dimensionality Reduction** | Reduces number of features | PCA, t-SNE | Compressing image data |
+
+### 3. Reinforcement Learning
+- An **agent** learns by **trial and error** — gets rewards for good actions, penalties for bad
+- Example: AlphaGo, training a robot to walk
+
+**Interview answer:**
+> "Supervised learning uses labeled data — like predicting house prices from features. Unsupervised learning finds patterns without labels — like grouping customers into segments. Reinforcement learning is reward-based — an agent learns optimal actions through trial and error."
+
+---
+
+## CHAPTER 3: Key Algorithms — Know These Cold
+
+You don't need to derive math. You need to know **what, when, why, and how**.
+
+---
+
+### 3.1 Linear Regression
+- **What:** Draws the best-fit line through data points
+- **Used for:** Regression (continuous output)
+- **Equation:** `y = mx + c` (simple) or `y = w1x1 + w2x2 + ... + b` (multiple)
+- **How it works:** Minimizes the **sum of squared errors** (Ordinary Least Squares)
+- **Assumptions:** Linear relationship, no multicollinearity, residuals are normally distributed
+
+```python
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+```
+
+**Interview Q: "What is cost function in Linear Regression?"**
+> "The cost function measures how wrong our predictions are. In linear regression, we use Mean Squared Error (MSE) — the average of squared differences between predicted and actual values. The model tries to minimize this."
+
+---
+
+### 3.2 Logistic Regression
+- **What:** Despite the name, it's for **classification**, not regression
+- **Used for:** Binary classification (yes/no, spam/not spam)
+- **How it works:** Uses the **sigmoid function** to squeeze output between 0 and 1
+
+```
+Sigmoid: σ(z) = 1 / (1 + e^(-z))
+
+If output >= 0.5 → Class 1
+If output < 0.5  → Class 0
+```
+
+```python
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+```
+
+**Interview Q: "Why is it called Logistic Regression if it's for classification?"**
+> "It's called regression because it predicts a probability (continuous value between 0 and 1) using a regression equation. But we apply a threshold to that probability to make it a classification."
+
+---
+
+### 3.3 Decision Tree
+- **What:** Splits data into branches based on feature conditions — looks like a flowchart
+- **Used for:** Both regression and classification
+- **How it works:** At each node, it picks the feature and threshold that best separates the data
+
+```
+            [Age > 30?]
+            /          \
+        Yes             No
+        /                \
+ [Salary > 50k?]      [Student?]
+   /      \            /      \
+ Buy     Don't      Buy    Don't
+```
+
+**Key terms:**
+- **Entropy:** Measures impurity/disorder (0 = pure, 1 = max impurity)
+- **Information Gain:** Reduction in entropy after a split
+- **Gini Impurity:** Alternative to entropy (used in CART algorithm)
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+model = DecisionTreeClassifier(max_depth=5)
+model.fit(X_train, y_train)
+```
+
+**Interview Q: "What is overfitting in Decision Trees?"**
+> "Decision Trees can grow very deep and memorize the training data, including noise. This makes them perform well on training data but poorly on unseen data. We control this with hyperparameters like max_depth, min_samples_split, and min_samples_leaf."
+
+---
+
+### 3.4 Random Forest
+- **What:** An **ensemble** of many Decision Trees
+- **How it works:** Creates multiple trees on random subsets of data and features, then takes the **majority vote** (classification) or **average** (regression)
+- **Why it's better:** Reduces overfitting that a single Decision Tree suffers from
+
+```
+Tree 1 → "Buy"
+Tree 2 → "Don't Buy"
+Tree 3 → "Buy"
+Tree 4 → "Buy"
+Tree 5 → "Don't Buy"
+
+Majority Vote → "Buy" ✓
+```
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier(n_estimators=100, max_depth=10)
+model.fit(X_train, y_train)
+```
+
+**Interview Q: "What is bagging?"**
+> "Bagging stands for Bootstrap Aggregating. It means creating multiple random samples of the training data WITH replacement, training a model on each, and combining their predictions. Random Forest uses bagging."
+
+---
+
+### 3.5 K-Nearest Neighbors (KNN)
+- **What:** Classifies a data point based on the **majority class of its K nearest neighbors**
+- **How it works:** Calculate distance (usually Euclidean), find K closest points, vote
+- **Key choice:** Value of K
+
+```
+K = 3, neighbors = [Cat, Cat, Dog] → Prediction = Cat
+K = 5, neighbors = [Cat, Cat, Dog, Dog, Dog] → Prediction = Dog
+```
+
+```python
+from sklearn.neighbors import KNeighborsClassifier
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+```
+
+**Interview Q: "What happens if K is too small or too large?"**
+> "If K is too small (like 1), the model is very sensitive to noise — it overfits. If K is too large, it becomes too general and underfits. We usually try odd values of K to avoid ties."
+
+---
+
+### 3.6 Support Vector Machine (SVM)
+- **What:** Finds the **optimal hyperplane** (boundary) that **maximizes the margin** between classes
+- **Key concept:** Support vectors are the data points closest to the boundary
+- **Kernel Trick:** Can handle non-linear data by mapping it to higher dimensions
+
+```
+Class A:  ○ ○           |           × ×  :Class B
+          ○  ○          |          ×  ×
+              ○    margin|margin    ×
+                         |
+                    Hyperplane
+```
+
+```python
+from sklearn.svm import SVC
+model = SVC(kernel='rbf')
+model.fit(X_train, y_train)
+```
+
+**Interview Q: "What is the kernel trick in SVM?"**
+> "The kernel trick allows SVM to handle non-linearly separable data by implicitly mapping it into a higher-dimensional space where a linear boundary can be found — without actually computing the transformation. Common kernels are linear, polynomial, and RBF."
+
+---
+
+### 3.7 K-Means Clustering
+- **What:** Unsupervised algorithm that groups data into K clusters
+- **How it works:**
+  1. Randomly initialize K centroids
+  2. Assign each point to nearest centroid
+  3. Recalculate centroids as mean of assigned points
+  4. Repeat until centroids stop moving
+
+```python
+from sklearn.cluster import KMeans
+model = KMeans(n_clusters=3)
+model.fit(X)
+labels = model.labels_
+```
+
+**Interview Q: "How do you choose the value of K?"**
+> "We use the Elbow Method — plot the within-cluster sum of squares (WCSS) for different K values and look for the 'elbow' point where adding more clusters doesn't significantly reduce WCSS."
+
+---
+
+## CHAPTER 4: Critical Concepts — Must-Know Theory
+
+These come up in **every** ML interview.
+
+---
+
+### 4.1 Overfitting vs Underfitting
+
+| | Overfitting | Underfitting |
+|---|---|---|
+| **Meaning** | Model learns training data TOO well (including noise) | Model is too simple to capture patterns |
+| **Training Accuracy** | Very High | Low |
+| **Test Accuracy** | Low | Low |
+| **Variance** | High | Low |
+| **Bias** | Low | High |
+| **Cause** | Model too complex, too little data | Model too simple, too few features |
+
+**Interview answer:**
+> "Overfitting is when the model memorizes the training data — high training accuracy but poor generalization. Underfitting is when the model is too simple to capture the underlying pattern. We fix overfitting with regularization, cross-validation, and more data. We fix underfitting with more complex models or better features."
+
+---
+
+### 4.2 Bias-Variance Tradeoff
+
+```
+Total Error = Bias² + Variance + Irreducible Error
+```
+
+- **Bias:** Error from wrong assumptions (underfitting)
+- **Variance:** Error from sensitivity to small fluctuations in training data (overfitting)
+- **Tradeoff:** Decreasing bias increases variance and vice versa
+- **Goal:** Find the sweet spot
+
+---
+
+### 4.3 Cross-Validation
+
+- Instead of one train-test split, split data into **K folds**
+- Train on K-1 folds, test on 1 fold — rotate K times
+- Average the results
+
+```
+Fold 1: [TEST] [Train] [Train] [Train] [Train]
+Fold 2: [Train] [TEST] [Train] [Train] [Train]
+Fold 3: [Train] [Train] [TEST] [Train] [Train]
+Fold 4: [Train] [Train] [Train] [TEST] [Train]
+Fold 5: [Train] [Train] [Train] [Train] [TEST]
+```
+
+```python
+from sklearn.model_selection import cross_val_score
+scores = cross_val_score(model, X, y, cv=5)
+print(scores.mean())
+```
+
+**Interview Q: "Why not just use a single train-test split?"**
+> "A single split depends on how the data happens to be divided. You might get lucky or unlucky. K-Fold cross-validation gives a more reliable estimate by training and testing on different subsets and averaging the results."
+
+---
+
+### 4.4 Regularization
+
+- **Problem:** Overfitting
+- **Solution:** Add a penalty term to the cost function to keep weights small
+
+| Type | Also Called | What it does | When to use |
+|---|---|---|---|
+| **L1 (Lasso)** | Lasso Regression | Can shrink some weights to exactly **zero** (feature selection) | When you want to eliminate irrelevant features |
+| **L2 (Ridge)** | Ridge Regression | Shrinks weights close to zero but never exactly zero | When all features are somewhat relevant |
+| **ElasticNet** | Combination | Both L1 + L2 | Best of both worlds |
+
+```python
+from sklearn.linear_model import Ridge, Lasso
+ridge = Ridge(alpha=1.0)
+lasso = Lasso(alpha=1.0)
+```
+
+**Interview answer:**
+> "Regularization prevents overfitting by adding a penalty for large weights. L1 (Lasso) can make weights zero, effectively doing feature selection. L2 (Ridge) shrinks weights but keeps them all. The alpha parameter controls the strength of regularization."
+
+---
+
+### 4.5 Feature Scaling
+
+**Why:** Many algorithms (KNN, SVM, Gradient Descent) are sensitive to the scale of features.
+
+| Method | Formula | When |
+|---|---|---|
+| **StandardScaler** | (x - mean) / std | When data is normally distributed |
+| **MinMaxScaler** | (x - min) / (max - min) | When you need values in [0, 1] range |
+
+```python
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+```
+
+**Interview Q: "Which algorithms need feature scaling and which don't?"**
+> "Distance-based algorithms like KNN and SVM need scaling. Gradient descent-based algorithms like Linear Regression and Neural Networks converge faster with scaling. Tree-based algorithms like Decision Tree and Random Forest do NOT need scaling because they split on feature thresholds, not distances."
+
+---
+
+### 4.6 Handling Missing Data
+
+You probably already do this, but know the **theory** behind the methods:
+
+| Method | When to use |
+|---|---|
+| **Drop rows** | Very few missing values (<5%) |
+| **Mean/Median imputation** | Numerical columns, missing at random |
+| **Mode imputation** | Categorical columns |
+| **Forward/Backward fill** | Time series data |
+| **KNN Imputation** | Use similar rows to estimate |
+| **Flag + Impute** | Create a new binary column indicating missing, then impute |
+
+```python
+# You know this already
+df['age'].fillna(df['age'].median(), inplace=True)
+# Or sklearn way
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='median')
+X_imputed = imputer.fit_transform(X)
+```
+
+---
+
+### 4.7 Encoding Categorical Data
+
+| Method | When | Example |
+|---|---|---|
+| **Label Encoding** | Ordinal data (has order) | Low=0, Medium=1, High=2 |
+| **One-Hot Encoding** | Nominal data (no order) | Red=[1,0,0], Blue=[0,1,0], Green=[0,0,1] |
+
+```python
+# Label Encoding
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df['city_encoded'] = le.fit_transform(df['city'])
+
+# One-Hot Encoding
+pd.get_dummies(df, columns=['city'], drop_first=True)
+```
+
+**Interview Q: "When would you use Label Encoding vs One-Hot Encoding?"**
+> "Label Encoding when categories have a natural order — like education level (high school < bachelor's < master's). One-Hot Encoding when categories have no order — like city names. Using Label Encoding on nominal data can mislead the model into thinking there's an order."
+
+---
+
+## CHAPTER 5: Evaluation Metrics
+
+Interviewers **love** this section. Know it thoroughly.
+
+---
+
+### 5.1 For Classification
+
+#### Confusion Matrix
+
+```
+                  Predicted
+                  Positive    Negative
+Actual  Positive    TP           FN
+        Negative    FP           TN
+```
+
+| Metric | Formula | What it tells you |
+|---|---|---|
+| **Accuracy** | (TP+TN) / Total | Overall correctness |
+| **Precision** | TP / (TP+FP) | Of all predicted positives, how many are actually positive? |
+| **Recall (Sensitivity)** | TP / (TP+FN) | Of all actual positives, how many did we catch? |
+| **F1 Score** | 2 × (Precision × Recall) / (Precision + Recall) | Harmonic mean of Precision and Recall |
+| **Specificity** | TN / (TN+FP) | Of all actual negatives, how many did we correctly identify? |
+
+**Interview Q: "When would you prefer Precision over Recall?"**
+> "When the cost of a false positive is high. For example, in spam detection — marking a legitimate email as spam (FP) is worse than letting spam through (FN). So we optimize for Precision. In medical diagnosis, missing a disease (FN) is worse, so we optimize for Recall."
+
+**Interview Q: "Why F1 Score instead of just Accuracy?"**
+> "Accuracy is misleading with imbalanced data. If 95% of emails are not spam, a model that predicts 'not spam' always gets 95% accuracy but catches zero spam. F1 Score balances Precision and Recall, making it better for imbalanced datasets."
+
+```python
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred))
+```
+
+---
+
+### 5.2 For Regression
+
+| Metric | Formula | Meaning |
+|---|---|---|
+| **MAE** (Mean Absolute Error) | avg(|y - ŷ|) | Average absolute error — easy to interpret |
+| **MSE** (Mean Squared Error) | avg((y - ŷ)²) | Penalizes large errors more |
+| **RMSE** (Root MSE) | √MSE | Same unit as target variable |
+| **R² Score** | 1 - (SS_res / SS_tot) | How well model explains variance (1 = perfect, 0 = baseline) |
+
+---
+
+## CHAPTER 6: Ensemble Methods
+
+This is a **favorite** topic in interviews.
+
+### What is Ensemble Learning?
+Combining multiple models to get better performance than any single model.
+
+| Method | Strategy | Key Algorithm |
+|---|---|---|
+| **Bagging** | Train models on random subsets, **parallel** training | Random Forest |
+| **Boosting** | Train models **sequentially** — each corrects the previous one's errors | AdaBoost, Gradient Boosting, XGBoost |
+| **Stacking** | Train different types of models, use a meta-model to combine predictions | Any combination |
+
+**Interview Q: "What is the difference between Bagging and Boosting?"**
+> "Bagging trains multiple models independently on random subsets of data and combines their predictions by voting or averaging — it reduces variance. Boosting trains models sequentially — each new model focuses on the mistakes of the previous one — it reduces bias. Random Forest uses bagging, while XGBoost uses boosting."
+
+---
+
+## CHAPTER 7: Neural Networks — Just the Basics
+
+You don't need deep DL knowledge for PG-DAC interviews, but you need to explain the fundamentals.
+
+### Structure
+
+```
+Input Layer → Hidden Layers → Output Layer
+
+Each neuron:
+1. Takes inputs × weights
+2. Adds bias
+3. Applies activation function
+4. Passes output forward
+```
+
+### Key Terms
+
+| Term | Meaning |
+|---|---|
+| **Weights** | Learnable parameters that determine importance of inputs |
+| **Bias** | An additional parameter to shift the activation function |
+| **Activation Function** | Introduces non-linearity |
+| **Epoch** | One complete pass through the entire training dataset |
+| **Batch Size** | Number of samples processed before updating weights |
+| **Learning Rate** | Step size for weight updates during optimization |
+| **Backpropagation** | Algorithm to calculate gradients and update weights |
+| **Loss Function** | Measures how wrong the prediction is |
+
+### Common Activation Functions
+
+| Function | Range | Use |
+|---|---|---|
+| **Sigmoid** | (0, 1) | Binary classification output |
+| **ReLU** | [0, ∞) | Hidden layers (most common) |
+| **Tanh** | (-1, 1) | Hidden layers (alternative to sigmoid) |
+| **Softmax** | (0, 1), sums to 1 | Multi-class classification output |
+
+**Interview Q: "Why do we need activation functions?"**
+> "Without activation functions, a neural network would just be a series of linear transformations, which is equivalent to a single linear function. Activation functions introduce non-linearity, allowing the network to learn complex patterns."
+
+---
+
+## CHAPTER 8: NLP Basics
+
+If the interviewer mentions text/NLP, you should know these:
+
+| Concept | Meaning |
+|---|---|
+| **Tokenization** | Splitting text into words or sentences |
+| **Stopwords** | Common words to remove (the, is, at, a, an) |
+| **Stemming** | Reducing words to root form (running → run) — crude |
+| **Lemmatization** | Reducing to actual dictionary form (better → good) — accurate |
+| **Bag of Words (BoW)** | Represent text as word frequency counts |
+| **TF-IDF** | Weighs words by importance (frequent in doc but rare in corpus) |
+| **Word Embeddings** | Dense vector representation (Word2Vec, GloVe) |
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf = TfidfVectorizer(max_features=5000, stop_words='english')
+X_text = tfidf.fit_transform(corpus)
+```
+
+---
+
+## CHAPTER 9: Data Science Pipeline — Put It All Together
+
+Since you've worked on a project, frame your answer around this pipeline:
+
+```
+1. Problem Definition
+      ↓
+2. Data Collection
+      ↓
+3. Data Cleaning (handling nulls, duplicates, outliers)
+      ↓
+4. EDA (Exploratory Data Analysis — visualization, statistics)
+      ↓
+5. Feature Engineering (creating new features, encoding, scaling)
+      ↓
+6. Feature Selection (removing irrelevant features)
+      ↓
+7. Model Selection (pick algorithms)
+      ↓
+8. Model Training (fit on training data)
+      ↓
+9. Model Evaluation (test on unseen data)
+      ↓
+10. Hyperparameter Tuning (GridSearchCV, RandomSearchCV)
+      ↓
+11. Deployment
+```
+
+**Interview Q: "Walk me through your project."**
+Use this pipeline as your structure. Mention specific tools (pandas, numpy, sklearn) at each step.
+
+---
+
+## CHAPTER 10: Top 20 Interview Questions — Quick Answers
+
+| # | Question | Quick Answer |
+|---|---|---|
+| 1 | What is ML? | Subset of AI where machines learn patterns from data without explicit programming |
+| 2 | Supervised vs Unsupervised? | Supervised = labeled data, Unsupervised = no labels |
+| 3 | Overfitting? | Model memorizes training data, fails on new data. Fix with regularization, cross-validation, more data |
+| 4 | Bias vs Variance? | Bias = underfitting error, Variance = overfitting error |
+| 5 | Precision vs Recall? | Precision = TP/(TP+FP), Recall = TP/(TP+FN) |
+| 6 | What is Cross-Validation? | K-fold splitting for reliable model evaluation |
+| 7 | L1 vs L2 Regularization? | L1 = Lasso (feature selection), L2 = Ridge (weight shrinkage) |
+| 8 | Random Forest vs Decision Tree? | RF = ensemble of many trees, reduces overfitting |
+| 9 | Bagging vs Boosting? | Bagging = parallel (reduces variance), Boosting = sequential (reduces bias) |
+| 10 | What is Gradient Descent? | Optimization algorithm that iteratively adjusts weights to minimize cost function |
+| 11 | Feature Scaling? | StandardScaler vs MinMaxScaler — needed for distance-based and gradient-based algorithms |
+| 12 | How to handle missing data? | Drop, mean/median/mode impute, forward fill, KNN impute |
+| 13 | Label vs One-Hot Encoding? | Label = ordinal data, One-Hot = nominal data |
+| 14 | R² Score? | Proportion of variance explained by model (1 = perfect) |
+| 15 | What is PCA? | Dimensionality reduction technique — finds directions of maximum variance |
+| 16 | CNN vs RNN? | CNN = spatial data (images), RNN = sequential data (text, time series) |
+| 17 | What is Transfer Learning? | Using a pre-trained model on a new, related task |
+| 18 | What is Confusion Matrix? | Table showing TP, TN, FP, FN |
+| 19 | K-Means vs KNN? | K-Means = unsupervised clustering, KNN = supervised classification |
+| 20 | What is Deep Learning? | ML using multi-layered neural networks, works best with large data |
+
+---
+
+## BONUS: Your Project Talking Points
+
+When they ask about your project, structure it like this:
+
+> **"I worked on a [type] data science project where the goal was to [objective]. I used pandas and numpy for data manipulation, handled missing values using [method], performed EDA using matplotlib/seaborn, applied [algorithm] from scikit-learn, and evaluated using [metrics]. The main challenge was [something real], which I solved by [solution]."**
+
+Keep it honest. Keep it structured. Even if the project was small, showing you understand the pipeline matters more than scale.
+
+---
+
+This covers roughly **90% of what a CDAC PG-DAC interview will ask** about AI/ML. You already have the hands-on piece — now you have the theory to back it up. Read through this 2-3 times, and you'll be solid. If you want me to deep-dive into any specific topic or give you mock interview questions with detailed answers, just say the word.
+
+============================================================
+CHAPTER 11: NLP INTERVIEW THEORY + PRACTICAL COMMANDS
+============================================================
+
+11.1 What is NLP?
+NLP (Natural Language Processing) is a branch of AI that helps computers understand, process, analyze, and generate human language.
+
+Common NLP tasks:
+- Text classification: spam detection, sentiment analysis
+- Named Entity Recognition (NER): identifying names, places, companies, dates
+- Machine translation
+- Text summarization
+- Question answering
+- Chatbots
+- Topic modeling
+- Information extraction
+- Speech-to-text and text-to-speech
+
+Interview answer:
+"NLP is the field of AI concerned with enabling machines to understand and work with human language. A typical NLP pipeline includes cleaning, tokenization, normalization, feature extraction or embeddings, model training, and evaluation."
+
+11.2 Common NLP Pipeline
+1. Collect text data
+2. Remove duplicates and invalid samples
+3. Normalize text
+4. Tokenize
+5. Remove unwanted tokens or stopwords when appropriate
+6. Apply stemming or lemmatization when appropriate
+7. Convert text into numbers using BoW, TF-IDF, or embeddings
+8. Split data into train, validation, and test sets
+9. Train a model
+10. Evaluate using suitable metrics
+11. Perform error analysis
+12. Deploy and monitor
+
+11.3 Important NLP Terms
+
+Tokenization:
+Splitting text into smaller units such as sentences, words, or subwords.
+Example: "I love NLP" -> ["I", "love", "NLP"]
+
+Normalization:
+Converting text into a more consistent form, such as lowercasing, standardizing whitespace, and expanding contractions.
+
+Stopwords:
+Very common words such as "the", "is", and "at". Removing them can help some classical ML tasks, but it may hurt tasks where grammar and context matter.
+
+Stemming:
+Cuts a word to a rough root form.
+Example: studies, studying, studied -> studi
+Fast but may produce non-dictionary words.
+
+Lemmatization:
+Converts a word to its valid dictionary base form using linguistic rules.
+Example: better -> good, running -> run
+More accurate but slower than stemming.
+
+N-grams:
+Sequences of N tokens.
+- Unigram: one word
+- Bigram: two consecutive words
+- Trigram: three consecutive words
+Example: "machine learning model"
+Bigrams: "machine learning", "learning model"
+
+Corpus:
+The complete collection of text documents used in an NLP task.
+
+Vocabulary:
+The set of unique tokens known to a model or vectorizer.
+
+Out-of-Vocabulary (OOV):
+A word or token not present in the model's vocabulary.
+
+11.4 Bag of Words vs TF-IDF vs Embeddings
+
+Bag of Words (BoW):
+- Represents a document using word counts
+- Ignores word order and context
+- Simple and effective for baseline models
+
+TF-IDF:
+- Gives a high score to a word that is frequent in one document but rare across the corpus
+- Reduces the importance of very common words
+- Commonly used with Logistic Regression, Naive Bayes, and SVM
+
+Word Embeddings:
+- Dense vectors that capture semantic similarity
+- Similar words have nearby vectors
+- Examples: Word2Vec, GloVe, FastText
+
+Contextual Embeddings:
+- A word receives a representation based on surrounding text
+- The word "bank" can have different vectors in "river bank" and "bank account"
+- Examples: BERT-family models and modern transformer encoders
+
+11.5 Practical NLP Commands
+
+Basic cleaning with Python:
+
+import re
+
+def clean_text(text):
+    text = str(text).lower()
+    text = re.sub(r'https?://\S+|www\.\S+', ' ', text)  # remove URLs
+    text = re.sub(r'<.*?>', ' ', text)                  # remove HTML
+    text = re.sub(r'[^a-z0-9\s]', ' ', text)            # remove punctuation
+    text = re.sub(r'\s+', ' ', text).strip()            # normalize spaces
+    return text
+
+Pandas usage:
+
+df['clean_text'] = df['text'].fillna('').apply(clean_text)
+df = df.drop_duplicates(subset=['clean_text'])
+df = df[df['clean_text'].str.len() > 0]
+
+Word tokenization using NLTK:
+
+import nltk
+from nltk.tokenize import word_tokenize
+
+nltk.download('punkt')
+tokens = word_tokenize("NLP is useful for text data.")
+
+Stopword removal:
+
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+stop_words = set(stopwords.words('english'))
+filtered = [word for word in tokens if word.lower() not in stop_words]
+
+Stemming:
+
+from nltk.stem import PorterStemmer
+stemmer = PorterStemmer()
+stemmed = [stemmer.stem(word) for word in filtered]
+
+Lemmatization:
+
+from nltk.stem import WordNetLemmatizer
+nltk.download('wordnet')
+lemmatizer = WordNetLemmatizer()
+lemmas = [lemmatizer.lemmatize(word) for word in filtered]
+
+TF-IDF:
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf = TfidfVectorizer(
+    lowercase=True,
+    stop_words='english',
+    ngram_range=(1, 2),
+    max_features=5000,
+    min_df=2
+)
+X = tfidf.fit_transform(df['clean_text'])
+
+Text classification baseline:
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    df['label'],
+    test_size=0.2,
+    random_state=42,
+    stratify=df['label']
+)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print(classification_report(y_test, y_pred))
+
+Important interview warning:
+Fit the vectorizer only on training data to avoid data leakage.
+
+Correct pipeline:
+
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer(stop_words='english', ngram_range=(1, 2))),
+    ('model', LogisticRegression(max_iter=1000))
+])
+
+pipeline.fit(X_train_text, y_train)
+predictions = pipeline.predict(X_test_text)
+
+11.6 NLP Evaluation Metrics
+- Accuracy: useful when classes are balanced
+- Precision: important when false positives are costly
+- Recall: important when false negatives are costly
+- F1-score: balances precision and recall
+- Macro F1: gives equal importance to every class
+- Weighted F1: weights each class by its support
+- BLEU: often used for machine translation
+- ROUGE: often used for summarization
+- Perplexity: used for language modeling; lower is generally better
+
+11.7 Common NLP Interview Questions
+
+Q: Why does a machine-learning model need text vectorization?
+A: Models work with numbers, not raw text. Vectorization converts text into numerical features while preserving useful information.
+
+Q: Stemming or lemmatization?
+A: Stemming is faster and cuts words roughly. Lemmatization is linguistically correct and returns dictionary forms. The choice depends on speed, quality, and the task.
+
+Q: Why can removing stopwords be harmful?
+A: Words like "not" may change meaning. Modern transformer models also use context and normally do not require manual stopword removal.
+
+Q: What is attention?
+A: Attention lets a model assign different importance to different tokens while processing a sequence.
+
+Q: What is a transformer?
+A: A transformer is a neural-network architecture based mainly on self-attention. It can process token relationships in parallel and is widely used in modern NLP.
+
+Q: What is data leakage in NLP?
+A: Leakage occurs when information from validation or test data influences training, for example fitting TF-IDF on the entire dataset before splitting.
+
+
+============================================================
+CHAPTER 12: DATA CLEANING — THEORY + COMMANDS
+============================================================
+
+12.1 What is Data Cleaning?
+Data cleaning is the process of detecting and correcting missing, invalid, duplicated, inconsistent, noisy, or incorrectly formatted data before analysis or modeling.
+
+12.2 Basic Inspection Commands
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('data.csv')
+
+print(df.head())
+print(df.tail())
+print(df.shape)
+print(df.columns)
+print(df.info())
+print(df.describe(include='all'))
+print(df.dtypes)
+print(df.isnull().sum())
+print(df.nunique())
+print(df.duplicated().sum())
+
+12.3 Missing Values
+
+Count missing values:
+
+df.isna().sum()
+df.isna().mean() * 100
+
+Drop rows or columns:
+
+df = df.dropna()
+df = df.dropna(subset=['target'])
+df = df.dropna(axis=1, thresh=int(0.7 * len(df)))
+
+Fill numerical missing values:
+
+df['age'] = df['age'].fillna(df['age'].median())
+df['salary'] = df['salary'].fillna(df['salary'].mean())
+
+Fill categorical missing values:
+
+df['city'] = df['city'].fillna(df['city'].mode()[0])
+df['city'] = df['city'].fillna('Unknown')
+
+Forward/backward fill:
+
+df['value'] = df['value'].ffill()
+df['value'] = df['value'].bfill()
+
+Sklearn imputation:
+
+from sklearn.impute import SimpleImputer
+
+num_imputer = SimpleImputer(strategy='median')
+cat_imputer = SimpleImputer(strategy='most_frequent')
+
+12.4 Duplicate Data
+
+Find duplicates:
+
+df[df.duplicated()]
+df[df.duplicated(subset=['email'], keep=False)]
+
+Remove duplicates:
+
+df = df.drop_duplicates()
+df = df.drop_duplicates(subset=['email'], keep='last')
+
+12.5 String Cleaning
+
+Strip spaces and standardize case:
+
+df['name'] = df['name'].astype(str).str.strip()
+df['city'] = df['city'].str.lower().str.strip()
+df['city'] = df['city'].str.title()
+
+Replace inconsistent values:
+
+df['gender'] = df['gender'].replace({
+    'M': 'Male',
+    'm': 'Male',
+    'F': 'Female',
+    'f': 'Female'
+})
+
+Remove unwanted characters:
+
+df['phone'] = df['phone'].astype(str).str.replace(r'\D', '', regex=True)
+
+12.6 Data Type Conversion
+
+Convert numeric columns:
+
+df['age'] = pd.to_numeric(df['age'], errors='coerce')
+
+Convert dates:
+
+df['date'] = pd.to_datetime(df['date'], errors='coerce', dayfirst=True)
+
+Convert categorical columns:
+
+df['category'] = df['category'].astype('category')
+
+12.7 Outlier Handling
+
+IQR method:
+
+Q1 = df['salary'].quantile(0.25)
+Q3 = df['salary'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+outliers = df[(df['salary'] < lower) | (df['salary'] > upper)]
+clean_df = df[(df['salary'] >= lower) & (df['salary'] <= upper)]
+
+Capping instead of deleting:
+
+df['salary'] = df['salary'].clip(lower=lower, upper=upper)
+
+Important interview point:
+Do not remove every outlier blindly. First determine whether it is a data error, a rare but valid case, or important business information.
+
+12.8 Validation Rules
+
+Range checks:
+
+df.loc[~df['age'].between(0, 120), 'age'] = np.nan
+
+Category checks:
+
+valid_status = ['active', 'inactive', 'pending']
+df.loc[~df['status'].isin(valid_status), 'status'] = 'unknown'
+
+Email pattern check:
+
+email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+df['valid_email'] = df['email'].str.match(email_pattern, na=False)
+
+12.9 Feature Scaling and Encoding
+
+Standard scaling:
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+Min-max scaling:
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+One-hot encoding:
+
+encoded = pd.get_dummies(df, columns=['city'], drop_first=True)
+
+Important interview warning:
+Fit preprocessing steps only on training data, then transform validation and test data. This prevents leakage.
+
+12.10 Data Cleaning Interview Questions
+
+Q: Mean or median imputation?
+A: Mean works for roughly symmetric data without large outliers. Median is safer for skewed data or outliers.
+
+Q: When should rows with missing values be dropped?
+A: When missingness is small, the rows are not systematically different, and dropping them will not damage the dataset or introduce bias.
+
+Q: Why is data cleaning important?
+A: Poor-quality data causes unreliable analysis, biased models, unstable training, and misleading evaluation.
+
+Q: What is data leakage?
+A: Leakage means the model receives information during training that would not be available when making real predictions.
+
+
+============================================================
+CHAPTER 13: DATA LABELING AND ANNOTATION
+============================================================
+
+13.1 What is Data Labeling?
+Data labeling is the process of assigning meaningful target values or annotations to raw data so that supervised-learning models can learn from it.
+
+Examples:
+- Email -> spam / not spam
+- Review -> positive / negative / neutral
+- Image -> cat / dog
+- Text span -> person / organization / location
+- Audio -> transcript
+- Object in image -> bounding box and class
+
+13.2 Common Types of Labeling
+
+Classification labeling:
+Assign one class to an entire item.
+Example: a support ticket is "billing", "technical", or "account".
+
+Multi-label classification:
+One item can have multiple labels.
+Example: an article can be both "technology" and "business".
+
+Sequence labeling:
+Assign a label to every token.
+Example: Named Entity Recognition.
+
+Bounding-box annotation:
+Draw rectangles around objects in an image.
+
+Segmentation:
+Assign a class to individual pixels.
+
+Transcription:
+Convert audio or handwriting into text.
+
+13.3 Labeling Workflow
+1. Define the business objective
+2. Create a clear label schema
+3. Write detailed annotation guidelines
+4. Select and train annotators
+5. Run a small pilot batch
+6. Review disagreements and unclear cases
+7. Label the complete dataset
+8. Measure annotation quality
+9. Resolve conflicts using adjudication
+10. Version the dataset and guidelines
+
+13.4 Good Annotation Guidelines
+Guidelines should contain:
+- Exact label definitions
+- Positive examples
+- Negative examples
+- Borderline examples
+- How to handle missing context
+- How to handle multiple valid labels
+- Rules for "other", "unknown", or "cannot determine"
+- Escalation process for uncertain cases
+
+13.5 Label Quality Metrics
+
+Inter-Annotator Agreement (IAA):
+Measures how often annotators agree.
+
+Cohen's Kappa:
+Agreement between two annotators after accounting for chance agreement.
+
+Fleiss' Kappa:
+Used when more than two annotators label items.
+
+Krippendorff's Alpha:
+Supports multiple annotators and different data types, and can handle missing annotations.
+
+Gold-standard accuracy:
+Compare annotator labels with a trusted expert-labeled subset.
+
+13.6 Data Labeling Commands with Pandas
+
+Load annotation file:
+
+labels = pd.read_csv('annotations.csv')
+print(labels['label'].value_counts(dropna=False))
+
+Find missing labels:
+
+missing = labels[labels['label'].isna()]
+
+Find invalid labels:
+
+allowed = {'positive', 'negative', 'neutral'}
+invalid = labels[~labels['label'].isin(allowed)]
+
+Find duplicate annotations:
+
+duplicates = labels[labels.duplicated(subset=['item_id', 'annotator_id'], keep=False)]
+
+Check class balance:
+
+class_counts = labels['label'].value_counts()
+class_percent = labels['label'].value_counts(normalize=True) * 100
+print(class_counts)
+print(class_percent)
+
+Agreement table:
+
+agreement = labels.pivot_table(
+    index='item_id',
+    columns='annotator_id',
+    values='label',
+    aggfunc='first'
+)
+
+Majority-vote label:
+
+majority = (
+    labels.groupby('item_id')['label']
+          .agg(lambda s: s.mode().iloc[0] if not s.mode().empty else None)
+          .reset_index(name='final_label')
+)
+
+Detect disagreements:
+
+disagreement = (
+    labels.groupby('item_id')['label']
+          .nunique()
+          .reset_index(name='unique_label_count')
+)
+disagreement = disagreement[disagreement['unique_label_count'] > 1]
+
+Cohen's Kappa example:
+
+from sklearn.metrics import cohen_kappa_score
+
+ann1 = agreement['annotator_1'].dropna()
+ann2 = agreement.loc[ann1.index, 'annotator_2']
+valid = ann2.notna()
+score = cohen_kappa_score(ann1[valid], ann2[valid])
+print(score)
+
+13.7 Label Noise
+Label noise means some training labels are incorrect, inconsistent, or ambiguous.
+
+Common causes:
+- Poor guidelines
+- Inexperienced annotators
+- Ambiguous samples
+- Fatigue
+- Copy-paste mistakes
+- Class definitions that overlap
+- Automatically generated weak labels
+
+Ways to reduce label noise:
+- Use multiple annotators
+- Review low-agreement samples
+- Add expert adjudication
+- Improve guidelines
+- Audit model errors
+- Relabel uncertain samples
+- Store annotator confidence
+
+13.8 Class Imbalance in Labeled Data
+
+Check imbalance:
+
+print(df['label'].value_counts(normalize=True))
+
+Stratified split:
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    stratify=y,
+    random_state=42
+)
+
+Class weights:
+
+model = LogisticRegression(class_weight='balanced', max_iter=1000)
+
+Important warning:
+Do not randomly oversample before splitting the data. Split first, then resample only the training set to avoid leakage.
+
+13.9 Data Labeling Interview Questions
+
+Q: What makes a high-quality label?
+A: It is accurate, consistent, relevant to the model objective, reproducible under clear guidelines, and traceable to an annotation process.
+
+Q: What would you do when annotators disagree?
+A: Measure disagreement, inspect unclear samples, use majority voting or expert adjudication, and improve the guidelines so future cases are handled consistently.
+
+Q: What is weak supervision?
+A: Weak supervision creates approximate labels using rules, heuristics, existing models, or external sources instead of fully manual labeling.
+
+Q: What is active learning?
+A: The model selects the most uncertain or informative unlabeled samples for humans to label, reducing labeling cost.
+
+Q: Why maintain a label version?
+A: Labels and guidelines change. Versioning makes experiments reproducible and helps track which model was trained on which annotation set.
+
+
+============================================================
+CHAPTER 14: COMMON PANDAS, NUMPY, AND SCIKIT-LEARN COMMANDS
+============================================================
+
+14.1 Pandas Selection and Filtering
+
+df['column']
+df[['col1', 'col2']]
+df.loc[rows, columns]
+df.iloc[row_positions, column_positions]
+df[df['age'] > 25]
+df.query('age > 25 and city == "Pune"')
+
+14.2 Sorting and Grouping
+
+df.sort_values('salary', ascending=False)
+df.sort_values(['department', 'salary'], ascending=[True, False])
+
+df.groupby('department')['salary'].mean()
+df.groupby('department').agg(
+    average_salary=('salary', 'mean'),
+    maximum_salary=('salary', 'max'),
+    employee_count=('employee_id', 'count')
+)
+
+14.3 Merge and Join
+
+pd.merge(left, right, on='id', how='inner')
+pd.merge(left, right, on='id', how='left')
+pd.concat([df1, df2], axis=0, ignore_index=True)
+
+14.4 Apply, Map, and Replace
+
+df['grade'] = df['score'].apply(lambda x: 'Pass' if x >= 40 else 'Fail')
+df['gender_code'] = df['gender'].map({'Male': 1, 'Female': 0})
+df['status'] = df['status'].replace({'A': 'Active', 'I': 'Inactive'})
+
+14.5 NumPy Basics
+
+import numpy as np
+
+a = np.array([1, 2, 3, 4])
+print(a.shape)
+print(a.mean())
+print(a.std())
+print(np.median(a))
+print(np.min(a), np.max(a))
+print(np.where(a > 2, 1, 0))
+
+14.6 Train-Test Split
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+14.7 ColumnTransformer Pipeline
+
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+
+numeric_features = ['age', 'salary']
+categorical_features = ['city', 'department']
+
+numeric_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+categorical_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('encoder', OneHotEncoder(handle_unknown='ignore'))
+])
+
+preprocessor = ColumnTransformer([
+    ('num', numeric_pipeline, numeric_features),
+    ('cat', categorical_pipeline, categorical_features)
+])
+
+model = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', LogisticRegression(max_iter=1000))
+])
+
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+14.8 Hyperparameter Tuning
+
+from sklearn.model_selection import GridSearchCV
+
+params = {
+    'classifier__C': [0.1, 1, 10],
+    'classifier__class_weight': [None, 'balanced']
+}
+
+grid = GridSearchCV(
+    model,
+    param_grid=params,
+    cv=5,
+    scoring='f1_macro',
+    n_jobs=-1
+)
+
+grid.fit(X_train, y_train)
+print(grid.best_params_)
+print(grid.best_score_)
+
+14.9 Save and Load a Model
+
+import joblib
+
+joblib.dump(model, 'model.joblib')
+loaded_model = joblib.load('model.joblib')
+predictions = loaded_model.predict(new_data)
+
+
+============================================================
+CHAPTER 15: EDA — EXPLORATORY DATA ANALYSIS
+============================================================
+
+EDA means understanding data before modeling through statistics, distributions, relationships, and anomalies.
+
+Questions to ask:
+- How many rows and columns exist?
+- What is the target variable?
+- Which features are numerical or categorical?
+- Are values missing?
+- Are duplicates present?
+- Are classes imbalanced?
+- Are distributions skewed?
+- Are outliers valid?
+- Are features strongly correlated?
+- Is there possible leakage?
+
+Commands:
+
+print(df.describe())
+print(df.corr(numeric_only=True))
+print(df['target'].value_counts(normalize=True))
+print(df.groupby('target').mean(numeric_only=True))
+
+Basic plots:
+
+import matplotlib.pyplot as plt
+
+# Histogram
+df['age'].hist()
+plt.show()
+
+# Box plot
+df.boxplot(column='salary')
+plt.show()
+
+# Class count
+df['target'].value_counts().plot(kind='bar')
+plt.show()
+
+Interview answer:
+"EDA helps me understand distributions, missing values, outliers, class balance, relationships, and possible leakage before choosing preprocessing and modeling steps."
+
+
+============================================================
+CHAPTER 16: IMPORTANT ML PRACTICES AND COMMON TRAPS
+============================================================
+
+1. Always keep a final untouched test set.
+2. Fit scalers, imputers, encoders, and vectorizers only on training data.
+3. Use stratification for imbalanced classification splits.
+4. Start with a simple baseline before trying complex models.
+5. Choose metrics according to the business cost of mistakes.
+6. Do not use accuracy alone for highly imbalanced data.
+7. Remove duplicate records before splitting, especially near-duplicate text.
+8. Check whether the same user, document, patient, or entity appears in both train and test sets.
+9. Use pipelines to prevent inconsistent preprocessing and leakage.
+10. Record random seeds, library versions, parameters, and dataset versions.
+11. Perform error analysis, not only metric comparison.
+12. Do not assume correlation means causation.
+13. Avoid blindly dropping outliers.
+14. A more complex model is not automatically better.
+15. Model performance can degrade after deployment because real-world data changes.
+
+Data drift:
+The input-data distribution changes over time.
+
+Concept drift:
+The relationship between inputs and target changes over time.
+
+Baseline model:
+A simple reference model used to judge whether a more advanced approach adds value.
+
+Hyperparameter vs parameter:
+- Parameters are learned from data, such as model weights.
+- Hyperparameters are configured before training, such as tree depth or learning rate.
+
+Feature engineering:
+Creating useful model inputs from raw data using domain knowledge.
+
+Feature selection:
+Choosing the most useful existing features and removing irrelevant or redundant ones.
+
+
+============================================================
+CHAPTER 17: 30 RAPID-FIRE INTERVIEW QUESTIONS
+============================================================
+
+1. What is supervised learning?
+Learning from labeled examples to predict outputs for new inputs.
+
+2. Regression vs classification?
+Regression predicts continuous values; classification predicts categories.
+
+3. What is overfitting?
+Excellent training performance but poor performance on unseen data.
+
+4. What is underfitting?
+The model is too simple to learn the real pattern.
+
+5. What is cross-validation?
+Repeatedly training and validating on different folds for a more reliable estimate.
+
+6. What is precision?
+Among predicted positives, the fraction that is actually positive.
+
+7. What is recall?
+Among actual positives, the fraction correctly detected.
+
+8. What is F1-score?
+The harmonic mean of precision and recall.
+
+9. Why scale features?
+To prevent large-scale features from dominating distance or gradient-based algorithms.
+
+10. Do trees require scaling?
+Usually no, because they split using thresholds rather than distances.
+
+11. What is one-hot encoding?
+Creating one binary column for each nominal category.
+
+12. Why use median imputation?
+It is robust to skewness and extreme values.
+
+13. What is leakage?
+Using information in training that would not be available at prediction time.
+
+14. Bagging vs boosting?
+Bagging trains models independently; boosting trains them sequentially to correct errors.
+
+15. What is random forest?
+An ensemble of decision trees trained with random samples and feature subsets.
+
+16. What is TF-IDF?
+A text weighting method that emphasizes words important to a document but less common across the corpus.
+
+17. What is tokenization?
+Splitting text into tokens such as words or subwords.
+
+18. What is lemmatization?
+Converting a word into its dictionary base form.
+
+19. What is NER?
+Identifying and classifying named entities such as people, organizations, places, and dates.
+
+20. What is annotation agreement?
+A measurement of how consistently different annotators label the same samples.
+
+21. What is class imbalance?
+One target class has far more samples than another.
+
+22. How do you handle class imbalance?
+Use suitable metrics, stratification, class weights, resampling on training data, or better data collection.
+
+23. What is a confusion matrix?
+A table of true positives, true negatives, false positives, and false negatives.
+
+24. What is feature engineering?
+Creating meaningful features from raw data.
+
+25. What is PCA?
+A dimensionality-reduction technique that projects data onto directions of maximum variance.
+
+26. What is GridSearchCV?
+A method that tests parameter combinations using cross-validation.
+
+27. What is a pipeline?
+An ordered chain of preprocessing and modeling steps treated as one estimator.
+
+28. What is model drift?
+Model quality decreases because production data or relationships change.
+
+29. What is active learning?
+Selecting the most informative unlabeled samples for human annotation.
+
+30. What is the first thing you do in an ML project?
+Clearly define the problem, target, success metric, constraints, and how predictions will be used.
+
+
+============================================================
+FINAL PROJECT ANSWER TEMPLATE
+============================================================
+
+"The objective of my project was to __________. I collected or received data from __________. I first inspected its shape, types, missing values, duplicates, class distribution, and possible leakage. I cleaned the data by __________ and performed EDA to understand __________. For preprocessing, I used __________. I selected __________ as a baseline and compared it with __________. I split the data using __________ and evaluated the model with __________ because __________. The final result was __________. The main challenge was __________, and I handled it by __________. If I continued the project, I would improve __________ and monitor __________ after deployment."
+
+============================================================
+LAST-MINUTE REVISION CHECKLIST
+============================================================
+
+Be able to explain:
+- AI vs ML vs DL
+- Supervised, unsupervised, and reinforcement learning
+- Regression vs classification
+- Linear and Logistic Regression
+- Decision Tree and Random Forest
+- KNN, SVM, and K-Means
+- Overfitting, underfitting, bias, and variance
+- Cross-validation and regularization
+- Scaling, encoding, imputation, and leakage
+- Confusion matrix, precision, recall, F1, MAE, MSE, RMSE, and R-squared
+- Bagging vs boosting
+- Neural-network basics
+- NLP preprocessing, TF-IDF, embeddings, attention, and transformers
+- Data-cleaning commands
+- Data-labeling workflow and agreement
+- Complete ML project pipeline
+- Your own project with honest examples and numbers
+
+END OF FILE
